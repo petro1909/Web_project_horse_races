@@ -1,0 +1,85 @@
+﻿@model IEnumerable<User>
+<!doctype html>
+<head>
+    <title>Hello ASP.NET MVC Core</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="~/css/user/Users.css" />
+</head>
+<body>
+    <section class="new_user">
+        <h3>Create new user</h3>
+        <form name="new_user_form" action="~/User/Create" method="post">
+            <div>
+                <label for="u_name">Name</label>
+                <input type="text" id="u_name" name="name" />
+            </div>
+            <div>
+                <label for="u_email">Email</label>
+                <input type="text" id="u_email" name="email" />
+            </div>
+            <div>
+                <label for="u_password">Password</label>
+                <input type="text" id="u_password" name="password" />
+            </div>
+            <div>
+                <label for="u_balance">Balance</label>
+                <input type="text" id="u_balance" name="UserBetProfile.MoneyBalance" />
+            </div>
+            <input type="submit" value="Create" />
+        </form>
+    </section>
+    <h2>User list</h2>
+    <section class="modelList">
+        @foreach (var user in Model)
+        {
+            <div class="user_item">
+                <div class="user_title">
+                    <span><a href="~/SingleUser?id=@user.Id">User №@user.Id</a></span>
+                </div>
+                <div class="user_description">
+                    <div class="user_profile">
+                        <p>Id: @user.Id</p>
+                        <p>Name: @user.Name</p>
+                        <p>Email: @user.Email</p>
+                        <p>Password: @user.Password</p>
+                    </div>
+                    <div class="user_bet_profile">
+                        <p>Money Balnce: @user.UserBetProfile.MoneyBalance</p>
+                        <p>Bets: @user.UserBetProfile.BetCount</p>
+                        <p>WinBets: @user.UserBetProfile.WinBets</p>
+                        <p>LoseBets: @user.UserBetProfile.LooseBets</p>
+                        @if (user.BanState)
+                        {
+                            <p>BANNED</p>
+                        }
+                        else
+                        {
+                            <p>NOT BUNNED</p>
+                        }
+                    </div>
+                    <div class="user_under_actions">
+                        <form action="~/SingleUser" method="get">
+                            <input type="hidden" name="id" value="@user.Id" />
+                            <input type="submit" value="Full proile" />
+                        </form>
+                        <form action="~/User/BanUser" method="get">
+                            <input type="hidden" name="id" value="@user.Id" />
+                            @if (!user.BanState)
+                            {
+                                <input type="submit" value="Ban user" />
+                            } else
+                            {
+                                <input type="submit" value="Unban user" />
+                            }
+                        </form>
+                        <form action="~/User/DeleteUser" method="get">
+                            <input type="hidden" name="id" value="@user.Id" />
+                            <input type="submit" value="Delete user" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </section>
+</body>

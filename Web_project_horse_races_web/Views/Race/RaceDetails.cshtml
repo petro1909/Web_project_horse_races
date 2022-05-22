@@ -1,0 +1,52 @@
+﻿@model Race
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<h4>Race participants</h4>
+<section class="add_participant">
+    <form class="add_participant_form" action="~/Race/AddParticipant" method="post">
+        <div>
+            <label for="rp_number">Number</label>
+            <input type="number" id="rp_number" name="number" />
+        </div>
+        <div>
+            <label for="horses">Choose horse</label>
+            <select name="id" id="horses">
+                @foreach (var horse in ViewBag.Horses)
+                {
+                <option value="@horse.Id">@horse.Name @horse.Age</option>
+                }
+            </select>
+        </div>
+        <div>
+            <input type="hidden" name="raceId" value="@Model.Id" />
+            <input type="submit" value="add participant" />
+        </div>
+    </form>
+</section>
+<div class="race_participant">
+    <table>
+        <tr>
+            <th>Id</th>
+            <th>Number</th>
+            <th>Position</th>
+            <th>Horse Id</th>
+            <th>Horse Name</th>
+            <th>Horse Age</th>
+        </tr>
+        @foreach (var raceParticipant in Model.RaceParticipants)
+        {
+        <tr>
+            <td>@raceParticipant.Id</td>
+            <td>@raceParticipant.Number</td>
+            <td>@raceParticipant.Position</td>
+            <td>@raceParticipant.Horse.Id</td>
+            <td>@raceParticipant.Horse.Name</td>
+            <td>@raceParticipant.Horse.Age</td>
+            <td>@Html.ActionLink("Delete", "DeleteParticipant", @raceParticipant)</td>
+        </tr>
+
+        }
+    </table>
+</div>

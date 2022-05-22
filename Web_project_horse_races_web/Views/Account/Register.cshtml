@@ -1,0 +1,44 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = null;
+}
+<!doctype html>
+<html>
+<head>
+    <title>Register</title>
+    <link type="text/css" rel="stylesheet" href="~/css/Account/Register.css" />
+</head>
+<body>
+    <section class="register_wrapper">
+        <div class="register_header">
+            <h2>Register</h2>
+        </div>
+        <div class="register_form_wrapper">
+            <form class="register_form" method="post">
+                <div class="name">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="Name" />
+                </div>
+                <div class="email">
+                    <label for="email">Email adress</label>
+                    <input type="text" id="email" name="Email" />
+                </div>
+                <div class="password">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="Password" />
+                </div>
+                <div class="confirm_password">
+                    <label for="c_password">Confirm Password</label>
+                    <input type="password" id="c_password" name="Password" />
+                </div>
+                <div class="sign_in_button">
+                    <input type="submit" value="Login" />
+                </div>
+            </form>
+        </div>
+    </section>
+</body>
+</html>
+

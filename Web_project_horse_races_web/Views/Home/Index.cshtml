@@ -1,0 +1,12 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Links {
+    <link rel="stylesheet" type="text/css" href="~/css/Home.css" />
+}
+
+<h1>Home Page</h1>
+<h2>@this.Context.Request.Cookies["id"];</h2>
+

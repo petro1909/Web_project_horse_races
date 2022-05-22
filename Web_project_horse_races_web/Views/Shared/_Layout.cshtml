@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="~/css/_Layout.css" />
+    @RenderSection("Links", required: false)
+</head>
+<body>
+    <header>
+        <section class="site_title">
+            <img class="logo" src="~/img/head-horse.png" />
+            <h1>HBet</h1>
+        </section>
+        <section class="header_menu">
+            <nav>
+                <ul>
+                    <li><a href="~/Home/Index">Home</a></li>
+                    <li><a href="~/UserList">Users</a></li>
+                    <li><a href="~/Horse/Index">Horses</a></li>
+                    <li><a href="~/Race/Index">Races</a></li>
+                    @if (Context.Request.Cookies["id"] != null)
+                    {
+                        <li><a href="~/Account/ShowProfile">Profile</a></li>
+                    }
+                </ul>
+            </nav>
+        </section>
+        <section class="user_identity">
+            @if (Context.Request.Cookies["id"] == null)
+            {
+                <p>@Html.ActionLink("Sign in", "Login", "Account")</p>
+                <p>@Html.ActionLink("Sign up", "Register", "Account")</p>
+            }
+            else
+            {
+                <p>@Context.Request.Cookies["name"]</p>
+                <p>@Html.ActionLink("Logout", "Logout", "Account")</p>
+            }
+        </section>
+    </header>
+    <main>
+        @RenderBody()
+    </main>
+    <footer>
+        <div>Footer</div>
+    </footer>
+    <script>
+    @RenderSection("scripts", required : false)
+    </script>
+</body >
+</html>

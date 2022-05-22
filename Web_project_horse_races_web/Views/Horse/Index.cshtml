@@ -1,0 +1,67 @@
+﻿@model IEnumerable<Horse>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Age)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0</td>
+            <form action="~/Horse/Create" method="post">
+                <td>
+                    <input type="text" name="name" placeholder="name" />
+                </td>
+                <td>
+                    <input type="number" name="age" placeholder="age" />
+                </td>
+                <td tabindex="3" colspan="2">
+                    <input type="submit" value="create" />
+                </td>
+            </form>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.Id
+                </td>
+  
+                <form action="~/Horse/Update" method="post">
+
+                    <input type="hidden" name="id" value="@item.Id" />
+
+                    <td>
+                        <input type="text" name="name" value="@item.Name" />
+                    </td>
+                    <td>
+                        <input type="number" name="age" value="@item.Age" />
+                    </td>
+                    <td>
+                        <input type="submit" value="edit" />
+                    </td>
+                </form>
+                <td>
+                    @Html.ActionLink("Delete", "Delete", @item);
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>

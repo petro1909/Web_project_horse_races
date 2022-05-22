@@ -1,0 +1,49 @@
+﻿* {
+    margin : 0;
+    padding: 0;
+}
+
+header {
+    display : flex;
+    flex-direction : row;
+    justify-content : space-between;
+    box-sizing : border-box;
+    padding : 5px;
+}
+
+header section.site_title img {
+    width : 30px;
+    height : 30px;
+}
+header section.site_title h1 {
+    display : inline-block;
+    font-size : 30px;
+}
+
+header section.header_menu nav {
+    border: 1px solid black;
+}
+
+header section.header_menu nav ul li a{
+    text-decoration : none;
+    font-size : 20px;
+    font-weight : 700;
+    margin-right : 10px;
+
+}
+.header_menu li {
+    display: inline;
+    list-style: none;
+}
+
+header .user_identity p{
+    margin-right : 10px;
+    display : inline-block;
+}
+
+header .user_identity p a {
+    text-decoration: none;
+    color : darkblue;
+    font-size : 20px;
+    font-weight : 700;
+} 

@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Race>
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@section links { 
+    <link rel="stylesheet" type="text/css" href="~/css/Race/Races.css" />
+    <link type="text/javascript" href="~/lib/jquery/dist/jquery.js" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+}
+<section class="wrapper">
+    <section class="race_list">
+        @foreach (var race in Model)
+        {
+            <div class="race_data" onclick="getRaceDetails(@race.Id)">
+                <h4>Race №@race.Id</h4>
+                <h4>Race Date : @race.RaceDate</h4>
+            </div>
+        }
+    </section>
+    <section id="race_details"></section>
+
+    <section class="user_bet">
+        <form action="~/Race/RegisterUserBet" method="post">
+            <label for="b_sum">Bet sum</label>
+            <input type="text" id="b_sum" name="betSum" />
+
+            <label for="rb_id">Race Bet id</label>
+            <input type="number" id="rb_id" name="raceBetId" />
+
+            <input type="submit" value="make bet" />
+        </form>
+    </section>
+    <script>
+        function getRaceDetails(r_id) {
+            var url = "/Race/ShowRaceDetails/" + r_id;
+            $("#race_details").load(url)
+        }
+    </script>
+</section>
+

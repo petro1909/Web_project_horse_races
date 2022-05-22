@@ -1,0 +1,54 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model Web_project_horse_races_db.Model.User
+<!doctype html>
+<html>
+<head>
+    <title>Hello ASP.NET MVC Core</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    @*<link href="~/css/Index.css" rel="stylesheet" type="text/css" />*@
+</head>
+<body>
+    <h3>User №@Model.Id</h3>
+    <section class="user_description">
+        <form class="user_description_form" action="~/User/Update" method="post">
+            <section class="user_profile">
+
+                <input type="hidden" name="id" value="@Model.Id" />
+                
+                <label for="u_name">User Name</label>
+                <input type="text" id="u_name" name="name" value="@Model.Name" />
+
+                <label for="u_login">User Email</label>
+                <input type="text" id="u_email" name="email" value="@Model.Email" />
+
+                <label for="u_password">User Password</label>
+                <input type="text" id="u_password" name="password" value="@Model.Password" />
+
+                <input type="submit" value="Save changes" />
+
+            </section>
+            </form>
+            <div>User Ban State : @Model.BanState</div>
+            <button action="~/User/BanUser">Bun user</button>
+            <section class="user_bet_profile">
+                <div>User money balance : @Model.UserBetProfile.MoneyBalance</div>
+                <div>User bet count : @Model.UserBetProfile.BetCount</div>
+                <div>User win bet count : @Model.UserBetProfile.WinBets</div>
+                <div>User loose bet count : @Model.UserBetProfile.LooseBets</div>
+                <section class="user_bets">
+                    @foreach(var userBet in Model.UserBetProfile.UserBets)
+                    {
+                        <div>@userBet.RaceBetId</div>
+                        <div>@userBet.BetSum</div>
+                        <div>@userBet.coefficient</div>
+                        <div>@userBet.PossibleWinSum</div>
+                    }
+                </section>
+            </section>
+           
+    </section>
+</body>
+</html>
