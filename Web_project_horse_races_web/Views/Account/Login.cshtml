@@ -4,6 +4,7 @@
 @{
     Layout = null;
 }
+@model LoginViewModel
 <!doctype html>
 <html>
     <head>
@@ -16,14 +17,16 @@
                 <h2>Login</h2>
             </div>
             <div class="login_form_wrapper">
-                <form class="login_form" method="post">
+                <form class="login_form" asp-controller="Account" asp-action="Login" method="post">
                     <div class="login">
-                        <label for="email">Email adress</label>
-                        <input type="text" id="email" name="Email" />
+                        <label asp-for="Email">Email adress</label>
+                        <input type="text" asp-for="Email" />
+                        <span asp-validation-for="Email"></span>
                     </div>
                     <div class="password">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="Password" />
+                        <label asp-for="Password">Password</label>
+                        <input type="password" asp-for="Password" />
+                        <span asp-validation-for="Password"></span>
                     </div>
                     <div class="remember">
                         <input type="checkbox" id="isRemember" name="isRemember" value="false" />

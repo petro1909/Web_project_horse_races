@@ -1,0 +1,139 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@section links {
+    <link rel="stylesheet" type="text/css" href="~/css/Race/AddRace.css" />
+}
+<section class="create_race_wrapper">
+    <section class="race_data">
+        <input type="datetime-local" name="datetime" />
+        <button id="CreateRace" onclick="CreateRace()">Create Race</button>
+        <h4>Race participants</h4>
+        <table id="rp">
+            <tr>
+                <th>Horse Id</th>
+                <th>Horse Name</th>
+                <th>Horse Age</th>
+                <th>Number</th>
+            </tr>
+        </table>
+    </section>
+    <section class="horses_to_add">
+        <table class="horses">
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Age</th>
+            </tr>
+            @foreach (Horse horse in Model)
+            {
+                <tr>
+                    <td>@horse.Id</td>
+                    <td>@horse.Name</td>
+                    <td>@horse.Age</td>
+                    <td><button name="add_horses_to_race" onclick="AddHorses(@horse.Id, '@horse.Name', @horse.Age)">Add Horse</button></td>
+                </tr>
+            }
+        </table>
+    </section>
+</section>
+<script>
+    function AddHorses(id, name, age) {
+        var ar = []
+        $.ajax({
+            method: "GET",
+            dataType : 'json',
+            url: "/Race/GetBetTypes",
+            success: function (list) {
+                CreateTr(id, name, age, list)              
+            }
+        })
+    }
+
+    function CreateTr(id, name, age, list) {
+        ar = list
+        console.log(ar)
+        var tdid = document.createElement("td");
+        tdid.innerText = id;
+
+        var tdname = document.createElement("td");
+        tdname.innerText = name;
+
+        var tdage = document.createElement("td");
+        tdage.innerText = age
+
+        var tdnumber = document.createElement("td");
+        tdnumber.innerText = id
+
+        var tr = document.createElement("tr");
+        tr.appendChild(tdid);
+        tr.appendChild(tdname);
+        tr.appendChild(tdage);
+        tr.appendChild(tdnumber);
+
+        for (var i = 0; i < list.length; i++) {
+            var input = document.createElement("INPUT");
+            input.setAttribute("type", "checkbox");
+            input.setAttribute("id", list[i].raceBetTypeName);
+            input.setAttribute("name", list[i].raceBetTypeName);
+            input.setAttribute("checked", true);
+
+            var label = document.createElement("LABEL");
+            label.setAttribute("for", list[i].raceBetTypeName);
+            label.innerText = list[i].raceBetTypeName;
+
+            var td = document.createElement("td");
+            td.appendChild(input);
+            td.appendChild(label);
+
+            tr.appendChild(td);
+        }
+
+        $("#rp").append(tr)
+    }
+
+    function CreateRace() {
+        var datetime = $("input[type=datetime-local]").val()
+        var trs = []
+        var raceParticipants = []
+        var bets = []
+        trs = $("#rp tr")
+        for (let i = 1; i < trs.length; i++) {
+            var tds = trs[i].children
+            var id = tds[0].innerText
+            var horseName = tds[1].innerText
+            var age = tds[2].innerText
+            var number = tds[3].innerText
+
+            var bets = []
+
+            for (var j = 4; j < tds.length; j++) {
+                var input = tds[j].children[0]
+                if (input.checked == true) {
+                    for (var k = 0; k < ar.length; k++) {
+                        
+                        if (ar[k].raceBetTypeName == input.name) {
+                            console.log(ar[k].raceBetTypeName)
+                            var raceParticipantBet = { 'RaceBetTypeId': ar[k].raceBetTypeId };
+                            bets.push(raceParticipantBet);
+                        }
+                    }
+                }
+            }
+            console.log(bets)
+            var raceParticipant = { 'HorseId': id, Number: number, RaceParticipantBets: bets }
+            raceParticipants.push(raceParticipant)
+        }
+        $.ajax({
+            type: "POST",
+            url: "/Race/AddRace",
+            data: { datetime, raceParticipants, bets },
+            crossDomain : true,
+            success: function (data) {
+                window.location.href = data;
+            }
+        })
+    }
+</script>

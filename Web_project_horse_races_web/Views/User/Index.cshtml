@@ -1,36 +1,12 @@
-﻿@model IEnumerable<User>
+﻿@model IEnumerable<BaseUser>
 <!doctype html>
-<head>
-    <title>Hello ASP.NET MVC Core</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
+
+@section links {
     <link rel="stylesheet" href="~/css/user/Users.css" />
-</head>
-<body>
-    <section class="new_user">
-        <h3>Create new user</h3>
-        <form name="new_user_form" action="~/User/Create" method="post">
-            <div>
-                <label for="u_name">Name</label>
-                <input type="text" id="u_name" name="name" />
-            </div>
-            <div>
-                <label for="u_email">Email</label>
-                <input type="text" id="u_email" name="email" />
-            </div>
-            <div>
-                <label for="u_password">Password</label>
-                <input type="text" id="u_password" name="password" />
-            </div>
-            <div>
-                <label for="u_balance">Balance</label>
-                <input type="text" id="u_balance" name="UserBetProfile.MoneyBalance" />
-            </div>
-            <input type="submit" value="Create" />
-        </form>
-    </section>
-    <h2>User list</h2>
+}
+<section class="wrapper">
     <section class="modelList">
+        <h2>User list</h2>
         @foreach (var user in Model)
         {
             <div class="user_item">
@@ -43,12 +19,9 @@
                         <p>Name: @user.Name</p>
                         <p>Email: @user.Email</p>
                         <p>Password: @user.Password</p>
+                        <p>Role: @user.Role.RoleName</p>
                     </div>
                     <div class="user_bet_profile">
-                        <p>Money Balnce: @user.UserBetProfile.MoneyBalance</p>
-                        <p>Bets: @user.UserBetProfile.BetCount</p>
-                        <p>WinBets: @user.UserBetProfile.WinBets</p>
-                        <p>LoseBets: @user.UserBetProfile.LooseBets</p>
                         @if (user.BanState)
                         {
                             <p>BANNED</p>
@@ -61,6 +34,7 @@
                     <div class="user_under_actions">
                         <form action="~/SingleUser" method="get">
                             <input type="hidden" name="id" value="@user.Id" />
+                            <input type="hidden" name="role" value="@user.Role.RoleName" />
                             <input type="submit" value="Full proile" />
                         </form>
                         <form action="~/User/BanUser" method="get">
@@ -68,7 +42,8 @@
                             @if (!user.BanState)
                             {
                                 <input type="submit" value="Ban user" />
-                            } else
+                            }
+                            else
                             {
                                 <input type="submit" value="Unban user" />
                             }
@@ -82,4 +57,41 @@
             </div>
         }
     </section>
-</body>
+    <section class="new_user">
+        <h2>Create User</h2>
+        <form class="register_form" asp-controller="User" asp-action="Create" method="post">
+            <div class="name">
+                <label for="u_name">Name</label>
+                <input type="text" for="u_name" name="name" />
+            </div>
+            <div class="email">
+                <label for="u_email">Email adress</label>
+                <input type="text" id="u_email" name="email" />
+            </div>
+            <div class="password">
+                <label for="u_password">Password</label>
+                <input type="password" id="u_password" name="password" />
+            </div>
+            <div class="user_role">
+                <label for="u_role">Choose Role</label>
+                <select id="u_role" name="roleId">
+                    @foreach (UserRole role in RegisterViewModel.GetUserRoles())
+                    {
+                        <option value=@role.Id>@role.RoleName</option>
+                    }
+                </select>
+            </div>
+            <div class="sign_in_button">
+                <input type="submit" value="Create" />
+            </div>
+        </form>
+    </section>
+</section>
+@section scripts {
+    <script>
+        $(".user_title").click(function () {
+            /*$(this).parent(".user_item").children(".user_description").slideToggle()*/
+            $(this).next(".user_description").slideToggle()
+        })
+    </script>
+}

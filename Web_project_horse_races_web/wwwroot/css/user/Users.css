@@ -3,32 +3,12 @@
     padding : 0;
 }
 
-.new_user form {
-    padding : 5px;
-    width : 20%;
-    border : 1px solid black;
-    background-color : lightgray;
-}
-.new_user form div {
-    margin : 5px;
-    padding : 5px;
-}
-.new_user form label {
-    display : inline-block;
-    width : 70px;
-}
-.new_user form input[type=text] {
-    width: 150px;
-    height : 20px;
-}
-
-.new_user form input[type=submit] {
-    width : 100px;
-    height : 30px;
+section.wrapper {
+    display : grid;
+    grid-template-columns : 70% 30%; 
 }
 
 div.user_item {
-    width : 65%;
     margin : 5px;
     background-color: lightgray;
     border : 1px solid black;
@@ -52,6 +32,33 @@ div.user_under_actions form input{
     margin : 5px;
 }
 
+
+.new_user form {
+    padding: 5px;
+    width: 70%;
+    border: 1px solid black;
+    background-color: lightgray;
+}
+
+.new_user form div {
+    margin: 5px;
+    padding: 5px;
+}
+
+.new_user form label {
+    display: inline-block;
+    width: 70px;
+}
+
+.new_user form input {
+    width: 150px;
+    height: 20px;
+}
+
+.new_user form input[type=submit] {
+    width: 100px;
+    height: 30px;
+}
 
 
 

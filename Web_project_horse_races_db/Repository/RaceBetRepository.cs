@@ -8,28 +8,31 @@ using Web_project_horse_races_db.Model;
 
 namespace Web_project_horse_races_db.Repository
 {
-    public class RaceBetRepository : IRepository<RaceBet>
+    public class RaceBetRepository : IRepository<RaceParticipantBet>
     {
-        public List<RaceBet> GetAll()
+        public List<RaceParticipantBet> GetAll()
         {
             using ApplicationContext db = new ApplicationContext();
             return db.RaceBets.ToList();
         }
 
-        public RaceBet GetOneById(int id)
+        public RaceParticipantBet GetOneById(int id)
         {
             using ApplicationContext db = new ApplicationContext();
-            return db.RaceBets.Find(id);
+            RaceParticipantBet raceParticipantBet = db.RaceBets.Find(id);
+            raceParticipantBet.RaceBetType = db.RaceBetTypes.Find(raceParticipantBet.RaceBetTypeId);
+            raceParticipantBet.RaceParticipant = new RaceParticipantRepository().GetOneById(raceParticipantBet.RaceParticipantId);
+            return raceParticipantBet;
         }
 
-        public void Save(RaceBet raceBet)
+        public void Save(RaceParticipantBet raceBet)
         {
             using ApplicationContext db = new ApplicationContext();
             db.RaceBets.Add(raceBet);
             db.SaveChanges();
         }
 
-        public void Update(RaceBet raceBet)
+        public void Update(RaceParticipantBet raceBet)
         {
             using ApplicationContext db = new ApplicationContext();
             db.RaceBets.Update(raceBet);
@@ -43,7 +46,7 @@ namespace Web_project_horse_races_db.Repository
             db.SaveChanges();
         }
 
-        public void Delete(RaceBet raceBet)
+        public void Delete(RaceParticipantBet raceBet)
         {
             using ApplicationContext db = new ApplicationContext();
             db.RaceBets.Remove(raceBet);

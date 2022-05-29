@@ -12,6 +12,8 @@ namespace Web_project_horse_races_db
     {
         static void Main(string[] args)
         {
+            //RaceRepository raceRepository = new RaceRepository();
+            //raceRepository.DeleteAll();
 
             //List<RaceParticipant> raceParticipants = new List<RaceParticipant>();
             //foreach (Horse horse in horses)
@@ -27,31 +29,7 @@ namespace Web_project_horse_races_db
             // RaceRepository repository = new RaceRepository();
 
             //List<Race> races = repository.GetAll();
-            unchecked
-            {
-                int r = int.MinValue - 127;
-
-                string result = string.Empty;
-
-                while (r >= 1)
-                {
-                    long reminder = r % 16;
-                    if (reminder > 9)
-                    {
-                        result += (char)(reminder + 55);
-                    }
-                    else
-                    {
-                        result += reminder;
-                    }
-
-                    r /= 16;
-                }
-
-                char[] resultArr = result.ToCharArray();
-                Array.Reverse(resultArr);
-                Console.WriteLine(new string(resultArr));
+            
             }
         }
     }
-}

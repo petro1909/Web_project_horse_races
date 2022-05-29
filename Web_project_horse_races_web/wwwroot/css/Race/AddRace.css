@@ -1,0 +1,8 @@
+﻿section.create_race_wrapper {
+    display : grid;
+    grid-template-columns : 1fr 1fr;
+}
+
+table td{
+    border: 1px solid black;
+}

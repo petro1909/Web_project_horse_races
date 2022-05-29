@@ -1,11 +1,11 @@
-﻿@model Race
+﻿@model RaceViewModel
 @*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 
 <h4>Race participants</h4>
 <section class="add_participant">
-    <form class="add_participant_form" action="~/Race/AddParticipant" method="post">
+    @*<form class="add_participant_form" action="~/Race/AddParticipant" method="post">
         <div>
             <label for="rp_number">Number</label>
             <input type="number" id="rp_number" name="number" />
@@ -23,30 +23,48 @@
             <input type="hidden" name="raceId" value="@Model.Id" />
             <input type="submit" value="add participant" />
         </div>
-    </form>
+    </form>*@
 </section>
-<div class="race_participant">
-    <table>
+<div class="bets_with_race_participants">
+   @foreach (RaceBetType raceBetType in Model.raceParticipantsByBetType.Keys)
+    {
+    <section class="race_participants_of_bet_type">
+        <h3>@raceBetType.RaceBetTypeName</h3>
+        <table>
+            <tr>
+                <th>Id</th>
+                <th>Number</th>
+                <th>Position</th>
+                <th>Horse Id</th>
+                <th>Horse Name</th>
+                <th>Horse Age</th>
+            </tr>
+            @foreach (RaceParticipantBet raceParticipantBet in Model.raceParticipantsByBetType[raceBetType])
+            {
         <tr>
-            <th>Id</th>
-            <th>Number</th>
-            <th>Position</th>
-            <th>Horse Id</th>
-            <th>Horse Name</th>
-            <th>Horse Age</th>
-        </tr>
-        @foreach (var raceParticipant in Model.RaceParticipants)
-        {
-        <tr>
-            <td>@raceParticipant.Id</td>
-            <td>@raceParticipant.Number</td>
-            <td>@raceParticipant.Position</td>
-            <td>@raceParticipant.Horse.Id</td>
-            <td>@raceParticipant.Horse.Name</td>
-            <td>@raceParticipant.Horse.Age</td>
-            <td>@Html.ActionLink("Delete", "DeleteParticipant", @raceParticipant)</td>
-        </tr>
+            <td>@raceParticipantBet.RaceParticipant.Id</td>
+            <td>@raceParticipantBet.RaceParticipant.Number</td>
+            <td>@raceParticipantBet.RaceParticipant.Position</td>
+            <td>@raceParticipantBet.RaceParticipant.Horse.Id</td>
+            <td>@raceParticipantBet.RaceParticipant.Horse.Name</td>
+            <td>@raceParticipantBet.RaceParticipant.Horse.Age</td>
+            <td>
+                <form asp-controller="Race" asp-action="MakeBookmakerBet" method="post">
+                    <input type="hidden" name="RaceParticipantBetId" value="@raceParticipantBet.Id" />
+                    <input type="number" name="betCoefficient" />
+                    <input type="submit" value="Make Bet" />
+                </form>
+            </td>
+            @foreach (BookmakerBet bookmakerBet in raceParticipantBet.BookmakerBets)
+            {
+                <td>@bookmakerBet.Id</td>
+                <td>@bookmakerBet.Coefficient</td>
+                <td>@bookmakerBet.Bookmaker.Email</td>
+            }
 
-        }
-    </table>
+        </tr>
+            }
+        </table>
+    </section>
+    }
 </div>

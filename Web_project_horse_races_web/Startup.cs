@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Web_project_horse_races_db.EntityFramework;
 using Web_project_horse_races_db.Repository;
 using Web_project_horse_races_db.Model;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Web_project_horse_races_web
 {
@@ -22,6 +23,10 @@ namespace Web_project_horse_races_web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews(options => options.EnableEndpointRouting = false);
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            {
+                options.LoginPath = new PathString("/Account/Login");
+            });
             //System.Reflection.Assembly.GetAssembly(typeof(IRepository<>))
             //.GetTypes()
             //.Where(item => item.GetInterfaces()
@@ -48,6 +53,7 @@ namespace Web_project_horse_races_web
             app.UseStaticFiles();
 
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseMvc(configure => configure.MapRoute(
                 name: "default",

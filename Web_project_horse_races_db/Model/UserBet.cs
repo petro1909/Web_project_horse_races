@@ -6,16 +6,23 @@ using System.Threading.Tasks;
 
 namespace Web_project_horse_races_db.Model
 {
-    public class UserBet
+    public enum BetStatus
     {
-        //public int Id { set; get; }
-        public int UserBetProfileId { set; get; }
-        public UserBetProfile UserBetProfile { set; get; }
-        public int RaceBetId {set; get; }
-        public RaceBet RaceBet { set; get; }
+        PASSED,
+        NOTPASSED,
+        WAITING
+    }
+    public class UserBet : BaseBet
+    {
+        public int UserId { set; get; }
+        public User User { set; get; }
+
+        public int BookmakerBetId { set; get; }
+        public BookmakerBet BookmakerBet { set; get; }
+
         public decimal BetSum { set; get; }
-        public double coefficient { set; get; }
         public decimal PossibleWinSum { set; get; }
-        //bool? BetStatus { set; get; }
+
+        public BetStatus BetStatus { set; get; }
     }
 }

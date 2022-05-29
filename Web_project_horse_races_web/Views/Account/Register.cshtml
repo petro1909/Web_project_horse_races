@@ -4,6 +4,7 @@
 @{
     Layout = null;
 }
+@model RegisterViewModel
 <!doctype html>
 <html>
 <head>
@@ -16,26 +17,36 @@
             <h2>Register</h2>
         </div>
         <div class="register_form_wrapper">
-            <form class="register_form" method="post">
+            <form class="register_form" asp-controller="Account" asp-action="Register" method="post">
                 <div class="name">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="Name" />
+                    <label asp-for="Name">Name</label>
+                    <input type="text" asp-for="Name" />
                 </div>
                 <div class="email">
-                    <label for="email">Email adress</label>
-                    <input type="text" id="email" name="Email" />
+                    <label asp-for="Email">Email adress</label>
+                    <input type="text" asp-for="Email" />
                 </div>
                 <div class="password">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="Password" />
+                    <label asp-for="Password">Password</label>
+                    <input type="password" asp-for="Password" />
                 </div>
                 <div class="confirm_password">
-                    <label for="c_password">Confirm Password</label>
-                    <input type="password" id="c_password" name="Password" />
+                    <label asp-for="ConfirmPassword">Confirm Password</label>
+                    <input type="password" asp-for="ConfirmPassword" />
+                </div>
+                <div class="user_role">
+                    <label asp-for="RoleId">Choose Role</label>
+                    <select asp-for="RoleId">
+                        @foreach (UserRole role in RegisterViewModel.GetUserRoles())
+                        {
+                            <option value=@role.Id>@role.RoleName</option>
+                        }
+                    </select>
                 </div>
                 <div class="sign_in_button">
                     <input type="submit" value="Login" />
                 </div>
+
             </form>
         </div>
     </section>

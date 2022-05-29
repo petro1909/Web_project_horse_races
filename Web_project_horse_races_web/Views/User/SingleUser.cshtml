@@ -1,54 +1,86 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@model Web_project_horse_races_db.Model.User
-<!doctype html>
-<html>
-<head>
-    <title>Hello ASP.NET MVC Core</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    @*<link href="~/css/Index.css" rel="stylesheet" type="text/css" />*@
-</head>
-<body>
+@model User
+@section links {
+    <link rel="stylesheet" href="~/css/user/SingleUser.css" />
+}
+<section class="wrapper">
+
     <h3>User №@Model.Id</h3>
+
     <section class="user_description">
-        <form class="user_description_form" action="~/User/Update" method="post">
-            <section class="user_profile">
-
-                <input type="hidden" name="id" value="@Model.Id" />
-                
-                <label for="u_name">User Name</label>
-                <input type="text" id="u_name" name="name" value="@Model.Name" />
-
-                <label for="u_login">User Email</label>
-                <input type="text" id="u_email" name="email" value="@Model.Email" />
-
-                <label for="u_password">User Password</label>
-                <input type="text" id="u_password" name="password" value="@Model.Password" />
-
+        @*<section class="user_profile">
+            <form class="user_profile_form">
+                <div class="user_name">
+                    <label for="u_name">User name</label>
+                    <input type="text" id="u_name" name="name" />
+                </div>
+                <div class="user_email">
+                    <label for="u_email">User email</label>
+                    <input type="text" id="u_email" name="email" />
+                </div>
+                <div class="user_password">
+                    <label for="u_password">User password</label>
+                    <input type="password" id="u_password" name="passwords" />
+                </div>
                 <input type="submit" value="Save changes" />
-
-            </section>
             </form>
+            
             <div>User Ban State : @Model.BanState</div>
             <button action="~/User/BanUser">Bun user</button>
-            <section class="user_bet_profile">
-                <div>User money balance : @Model.UserBetProfile.MoneyBalance</div>
-                <div>User bet count : @Model.UserBetProfile.BetCount</div>
-                <div>User win bet count : @Model.UserBetProfile.WinBets</div>
-                <div>User loose bet count : @Model.UserBetProfile.LooseBets</div>
-                <section class="user_bets">
-                    @foreach(var userBet in Model.UserBetProfile.UserBets)
+        </section>*@
+
+        <section class="user_bet_profile">
+            <section class="user_bets">
+                <h2>User bet history</h2>
+                <table class="bet_history">
+                    <tr>
+                        <th>Race Id</th>
+                        <th>Race Date</th>
+                        <th>Race Participant id</th>
+                        <th>Horse Name</th>
+                        <th>Horse Age</th>
+                        <th>Number</th>
+                        <th>Position</th>
+                        <th>Bet Type</th>
+                        <th>Bookmaker name</th>
+                        <th>coefficient</th>
+                        <th>bet sum</th>
+                        <th>possible win</th>
+                        <th>status</th>
+
+                    </tr>
+                    @foreach (var userBet in Model.UserBets)
                     {
-                        <div>@userBet.RaceBetId</div>
-                        <div>@userBet.BetSum</div>
-                        <div>@userBet.coefficient</div>
-                        <div>@userBet.PossibleWinSum</div>
+                    <tr>
+                        <td>@userBet.BookmakerBet.RaceParticipantBet.RaceParticipant.Race.Id</td>
+                        <td>@userBet.BookmakerBet.RaceParticipantBet.RaceParticipant.Race.RaceDate</td>
+                        <td>@userBet.BookmakerBet.RaceParticipantBet.RaceParticipant.Id</td>
+                        <td>@userBet.BookmakerBet.RaceParticipantBet.RaceParticipant.Horse.Name</td>
+                        <td>@userBet.BookmakerBet.RaceParticipantBet.RaceParticipant.Horse.Age</td>
+                        <td>@userBet.BookmakerBet.RaceParticipantBet.RaceParticipant.Number</td>
+                        <td>@userBet.BookmakerBet.RaceParticipantBet.RaceParticipant.Position</td>
+                        <td>@userBet.BookmakerBet.RaceParticipantBet.RaceBetType.RaceBetTypeName</td>
+                        <td>@userBet.BookmakerBet.Bookmaker.Name</td>
+                        <td>@userBet.BookmakerBet.Coefficient</td>
+                        <td>@userBet.BetSum</td>
+                        <td>@userBet.PossibleWinSum</td>
+                        <td>@userBet.BetStatus</td>
+                    </tr>
                     }
-                </section>
+                </table>
+                
             </section>
-           
+            <section class="profile_summary">
+                <h2>Summary</h2>
+                <div>User money balance : @Model.MoneyBalance</div>
+                <div>User bet count : @Model.BetCount</div>
+                <div>User win bet count : @Model.WinBets</div>
+                <div>User loose bet count : @Model.LooseBets</div>
+            </section>
+            
+        </section>
+
     </section>
-</body>
-</html>
+</section>

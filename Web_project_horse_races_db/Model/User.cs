@@ -1,37 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-
-#nullable disable
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Web_project_horse_races_db.Model
 {
-    public class User
+    public class User : BaseUser
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public bool BanState { set;  get; }
-        public UserBetProfile? UserBetProfile { set; get; }
+        public int BetCount { set; get; }
+        public int WinBets { set; get; }
+        public int LooseBets { set; get; }
+        public List<UserBet> UserBets { set; get; }
+        public decimal MoneyBalance { set; get; }
 
-        public User() { }
-        public User(string name, string email, string password)
-        {
-            this.Name = name;
-            this.Email = email;
-            this.Password = password;
+        public User() : base() { }
+
+        public User(string name, string email, string password) : base(name, email, password) {
+            MoneyBalance = 0;
+            BetCount = 0;
+            WinBets = 0;
+            LooseBets = 0;
+            UserBets = new List<UserBet>();
         }
-
 
         public override string ToString()
         {
-            return $"User [\n" +
-                $"\tId : {Id}\n" +
-                $"\tName : {Name}\n" +
-                $"\tEmail : {Email}\n" +
-                $"\tPassword : {Password}\n" + 
-                $"\tBet Profile : {UserBetProfile}" +
-                $"]";
+            return base.ToString() + "User Bet Profile [\n" +
+                $"MoneyBalance : {MoneyBalance}\n" +
+                $"Bet Count : {BetCount}\n" +
+                $"Win Bets : {WinBets}\n" +
+                $"Loose Bets : {LooseBets}";
         }
     }
 }

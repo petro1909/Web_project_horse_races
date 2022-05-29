@@ -9,49 +9,38 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Web_project_horse_races_db.Repository
 {
-    public class UserRepository :  IRepository<User>
+    public class UserRepository : BaseUserRepository
     {
-        public List<User> GetAll()
+        public new List<User> GetAll()
         {
             using ApplicationContext db = new ApplicationContext();
-            return db.Users.Include(u => u.UserBetProfile).ToList();
+            return db.Users.Include(u => u.Role).Include(u => u.UserBets).ToList();
         }
 
         public User GetOneById(int id)
         {
             using ApplicationContext db = new ApplicationContext();
+            
             User user = db.Users.Find(id);
-            user.UserBetProfile = db.UserBetProfiles.Find(user.Id);
-            user.UserBetProfile.UserBets = db.UserBets.Where(ub =>ub.UserBetProfileId == user.Id).ToList();
+            user.Role = db.Roles.FirstOrDefault(ur => ur.Id == user.RoleId);
+            user.UserBets = new UserBetRepository().GetRangeByUserId(id);
             return user;
         }
-
-        public User GetOneByLoginAndPassword(string login, string password)
-        {
-            using ApplicationContext db = new ApplicationContext();
-            User user = db.Users.FirstOrDefault(u => u.Email == login && u.Password == password);
-            return user;
-        }
-
 
         public void Save(User user)
         {
             using ApplicationContext db = new ApplicationContext();
+            //User u = new User() { Name = "u_name", Email = "u_email", Password = "u_password", RoleId = 3 };
             db.Users.Add(user);
-            try
-            {
-                db.SaveChanges();
-            } catch(DbUpdateException e)
-            {
-                Console.WriteLine("User with the same email already exist");
-            }
+            //db.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Users ON;");
+            db.SaveChanges();
+            //db.Database.ExecuteSqlRaw("SET IDENTITY_INSERT WEB_PROJECT_HORSE_RACES_test.Users OFF;");
         }
 
         public void Update(User user)
         {
             using ApplicationContext db = new ApplicationContext();
             db.Users.Update(user);
-            db.UserBetProfiles.Update(user.UserBetProfile);
             db.SaveChanges();
         }
 
@@ -64,7 +53,7 @@ namespace Web_project_horse_races_db.Repository
 
         public void AddUserBet(UserBet userBet)
         {
-            UserBetRepositiory userBetRepositiory = new UserBetRepositiory();
+            UserBetRepository userBetRepositiory = new UserBetRepository();
             userBetRepositiory.Save(userBet);
         }
 

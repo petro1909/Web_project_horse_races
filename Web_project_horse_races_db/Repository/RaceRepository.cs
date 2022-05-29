@@ -14,10 +14,18 @@ namespace Web_project_horse_races_db.Repository
         public List<Race> GetAll()
         {
             using ApplicationContext db = new ApplicationContext();
-            List<Race> races = db.Races.Include(r => r.RaceBets).ToList();
+            List<Race> races = db.Races.ToList();
             foreach(Race race in races)
             {
                 race.RaceParticipants = db.RaceParticipants.Include(rp => rp.Horse).Where(rp => rp.RaceId == race.Id).ToList();
+                foreach (RaceParticipant raceParticipant in race.RaceParticipants)
+                {
+                    raceParticipant.RaceParticipantBets = db.RaceBets.Where(rpb => rpb.RaceParticipantId == raceParticipant.Id).ToList();
+                    foreach(RaceParticipantBet bet in raceParticipant.RaceParticipantBets)
+                    {
+                        bet.RaceBetType = db.RaceBetTypes.Find(bet.RaceBetTypeId);
+                    }
+                } 
             }
             return races;
         }
@@ -27,7 +35,19 @@ namespace Web_project_horse_races_db.Repository
             using ApplicationContext db = new ApplicationContext();
             Race race = db.Races.Find(id);
             race.RaceParticipants = db.RaceParticipants.Include(rp => rp.Horse).Where(rp => rp.RaceId == race.Id).ToList();
-            race.RaceBets = db.RaceBets.Where(rb => rb.RaceId == id).ToList();
+            foreach (RaceParticipant raceParticipant in race.RaceParticipants)
+            {
+                raceParticipant.RaceParticipantBets = db.RaceBets.Where(rpb => rpb.RaceParticipantId == raceParticipant.Id).ToList();
+                foreach (RaceParticipantBet bet in raceParticipant.RaceParticipantBets)
+                {
+                    bet.RaceBetType = db.RaceBetTypes.Find(bet.RaceBetTypeId);
+                    bet.BookmakerBets = db.BookmakerBets.Where(bb => bb.RaceParticipantBetId == bet.Id).ToList();
+                    foreach(BookmakerBet bookmakerBet in bet.BookmakerBets)
+                    {
+                        bookmakerBet.Bookmaker = db.Bookmakers.Find(bookmakerBet.BookmakerId);
+                    }
+                }
+            }
             return race;
         }
 
@@ -50,11 +70,11 @@ namespace Web_project_horse_races_db.Repository
             RaceParticipantRepository raceParticipantRepository = new RaceParticipantRepository();
             raceParticipantRepository.Save(raceParticipant);
 
-            RaceBet raceBet = new RaceBet() { RaceId = raceParticipant.RaceId, RaceParicipantId = raceParticipant.Id };
+            RaceParticipantBet raceBet = new RaceParticipantBet() { RaceParticipantId = raceParticipant.Id};
             AddRaceBet(raceBet);
         }
 
-        public void AddRaceBet(RaceBet raceBet)
+        public void AddRaceBet(RaceParticipantBet raceBet)
         {
             RaceBetRepository raceBetRepository = new RaceBetRepository();
             raceBetRepository.Save(raceBet);

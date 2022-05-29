@@ -1,0 +1,8 @@
+﻿section.user_bet_profile{
+    display: grid;
+    grid-template-columns : 80% 20%;   
+}
+
+section.user_bet_profile section {
+    border: 1px solid black;
+}

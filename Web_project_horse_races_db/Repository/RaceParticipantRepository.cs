@@ -20,7 +20,10 @@ namespace Web_project_horse_races_db.Repository
         public RaceParticipant GetOneById(int id)
         {
             using ApplicationContext db = new ApplicationContext();
-            return db.RaceParticipants.Find(id);
+            RaceParticipant raceParticipant = db.RaceParticipants.Find(id);
+            raceParticipant.Horse = db.Horses.Find(raceParticipant.HorseId);
+            raceParticipant.Race = db.Races.Find(raceParticipant.RaceId);
+            return raceParticipant;
         }
 
         public void Save(RaceParticipant raceParticipant)

@@ -15,13 +15,17 @@ namespace Web_project_horse_races_db.EntityFramework
     public class ApplicationContext : DbContext
     {
         private readonly string connectionString;
+        public DbSet<BaseUser> BaseUsers => Set<BaseUser>();
         public DbSet<User> Users => Set<User>();
-        public DbSet<UserBetProfile> UserBetProfiles => Set<UserBetProfile>();
+        public DbSet<Bookmaker> Bookmakers => Set<Bookmaker>();
+        public DbSet<UserRole> Roles => Set<UserRole>();
+        public DbSet<UserBet> UserBets => Set<UserBet>();
+        public DbSet<BookmakerBet> BookmakerBets => Set<BookmakerBet>();
         public DbSet<Horse> Horses => Set<Horse>();
         public DbSet<Race> Races => Set<Race>();
         public DbSet<RaceParticipant> RaceParticipants => Set<RaceParticipant>();
-        public DbSet<RaceBet> RaceBets => Set<RaceBet>();
-        public DbSet<UserBet> UserBets => Set<UserBet>();
+        public DbSet<RaceParticipantBet> RaceBets => Set<RaceParticipantBet>();
+        public DbSet<RaceBetType> RaceBetTypes => Set<RaceBetType>();
         
         public ApplicationContext()
         {
@@ -32,44 +36,90 @@ namespace Web_project_horse_races_db.EntityFramework
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(connectionString);
-            optionsBuilder.LogTo(Console.WriteLine);
+            //optionsBuilder.LogTo(Console.WriteLine);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<BaseUser>(BaseUserConfig);
             modelBuilder.Entity<User>(UserConfig);
-            modelBuilder.Entity<UserBetProfile>(UserBetProfileConfig);
+            modelBuilder.Entity<Bookmaker>(BookmakerConfig);
+            modelBuilder.Entity<UserRole>(UserRoleConfig);
+            modelBuilder.Entity<UserBet>(UserBetConfig);
+            modelBuilder.Entity<BookmakerBet>(BookmakerBetConfig);
             modelBuilder.Entity<Horse>(HorseConfig);
             modelBuilder.Entity<Race>(RaceConfig);
             modelBuilder.Entity<RaceParticipant>(RaceParticipantConfig);
-            modelBuilder.Entity<RaceBet>(RaceBetConfig);
-            modelBuilder.Entity<UserBet>(UserBetConfig);
+            modelBuilder.Entity<RaceParticipantBet>(RaceParticipantBetConfig);
+            
+            modelBuilder.Entity<RaceBetType>(RaceBetTypeConfig);
 
+        }
+
+        private void BaseUserConfig(EntityTypeBuilder<BaseUser> baseUser)
+        {
+            baseUser.Property(u => u.Id).HasColumnName("UserId").HasColumnType("INT").ValueGeneratedOnAdd();
+            baseUser.HasKey(u => u.Id);
+
+            baseUser.Property(u => u.Name).HasColumnName("UserName").HasColumnType("VARCHAR(50)").IsRequired();
+            baseUser.Property(u => u.Email).HasColumnName("UserEmail").HasColumnType("VARCHAR(30)").IsRequired();
+            baseUser.HasAlternateKey(u => u.Email);
+
+            baseUser.Property(u => u.Password).HasColumnName("UserPassword").HasColumnType("VARCHAR(30)").IsRequired();
+            baseUser.Property(u => u.BanState).HasColumnType("UserBanState").HasColumnType("BIT").HasDefaultValue(0);
         }
 
         private void UserConfig(EntityTypeBuilder<User> user)
         {
             user.ToTable("Users");
-            user.Property(u => u.Id).HasColumnName("UserId").HasColumnType("INT").ValueGeneratedOnAdd();
-            user.HasKey(u => u.Id);
-            user.Property(u => u.Name).HasColumnName("UserName").HasColumnType("VARCHAR(50)").IsRequired();
-            user.Property(u => u.Email).HasColumnName("UserEmail").HasColumnType("VARCHAR(30)").IsRequired();
-            user.HasAlternateKey(u => u.Email);
-            user.Property(u => u.Password).HasColumnName("UserPassword").HasColumnType("VARCHAR(30)").IsRequired();
-            user.Property(u => u.BanState).HasColumnType("UserBanState").HasColumnType("BIT").HasDefaultValue(0);
-            user.HasOne(u => u.UserBetProfile).WithOne(b => b.User).HasForeignKey<UserBetProfile>(b => b.UserId).OnDelete(DeleteBehavior.Cascade);
+            
+            user.Property(u => u.BetCount).HasColumnName("UserBetCount").HasColumnType("INT").IsRequired();
+            user.Property(u => u.WinBets).HasColumnName("UserWinBetCount").HasColumnType("INT").IsRequired();
+            user.Property(u => u.LooseBets).HasColumnName("UserLooseBetCount").HasColumnType("INT").IsRequired();
+            user.Property(u => u.MoneyBalance).HasColumnName("UserMoneyBalance").HasColumnType("money").IsRequired();
+            user.HasMany(b => b.UserBets).WithOne(ub => ub.User).HasForeignKey(ub => ub.UserId).OnDelete(DeleteBehavior.Cascade);
         }
 
-        private void UserBetProfileConfig(EntityTypeBuilder<UserBetProfile> userBetProfile)
+        private void BookmakerConfig(EntityTypeBuilder<Bookmaker> bookmaker)
         {
-            userBetProfile.ToTable("UsersBetProfiles");
-            userBetProfile.Property(b => b.UserId).HasColumnName("UserId").HasColumnType("INT").ValueGeneratedOnAdd();
-            userBetProfile.HasKey(b => b.UserId);
-            userBetProfile.Property(b => b.MoneyBalance).HasColumnName("UserMoneyBalance").HasColumnType("money").IsRequired();
-            userBetProfile.Property(b => b.BetCount).HasColumnName("UserBetCount").HasColumnType("INT").IsRequired();
-            userBetProfile.Property(b => b.WinBets).HasColumnName("UserWinBetCount").HasColumnType("INT").IsRequired();
-            userBetProfile.Property(b => b.LooseBets).HasColumnName("UserLooseBetCount").HasColumnType("INT").IsRequired();
-            userBetProfile.HasMany(b => b.UserBets).WithOne(ub => ub.UserBetProfile).HasForeignKey(ub => ub.UserBetProfileId).OnDelete(DeleteBehavior.Cascade);
+            bookmaker.ToTable("Bookmakers");
+            bookmaker.Property(u => u.MoneyBalance).HasColumnName("BookmakerMoneyBalance").HasColumnType("money").IsRequired();
+            bookmaker.HasMany(b => b.BookmakerBets).WithOne(ub => ub.Bookmaker).HasForeignKey(ub => ub.BookmakerId).OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private void UserRoleConfig(EntityTypeBuilder<UserRole> userRole)
+        {
+            userRole.ToTable("UserRoles");
+            userRole.Property(ur => ur.RoleName).HasColumnName("RoleName").HasColumnType("varchar(30)");
+            userRole.HasMany(ur => ur.Users).WithOne(u => u.Role).HasForeignKey(u => u.RoleId);
+        }
+
+        private void UserBetConfig(EntityTypeBuilder<UserBet> userBet)
+        {
+            userBet.ToTable("UserBets");
+            userBet.Property(ub => ub.Id).HasColumnName("Id").HasColumnType("INT").ValueGeneratedOnAdd();
+            userBet.HasKey(ub => ub.Id);
+
+            userBet.Property(ub => ub.UserId).HasColumnName("UserId").HasColumnType("INT").ValueGeneratedOnAdd();
+            userBet.Property(ub => ub.BookmakerBetId).HasColumnName("BookmakerBetId").HasColumnType("INT").ValueGeneratedOnAdd();
+            
+            userBet.Property(ub => ub.BetSum).HasColumnName("UserBetSum").HasColumnType("money");
+            userBet.Property(ub => ub.PossibleWinSum).HasColumnName("UserBetPossibleWin").HasColumnType("money");
+            userBet.Property(ub => ub.BetStatus).HasColumnName("BetStatus").HasColumnType("varchar(20)");
+        }
+
+        private void BookmakerBetConfig(EntityTypeBuilder<BookmakerBet> bookmakerBet)
+        {
+            bookmakerBet.ToTable("BookmakerBets");
+            bookmakerBet.Property(bb => bb.Id).HasColumnName("Id").HasColumnType("INT").ValueGeneratedOnAdd();
+            bookmakerBet.HasKey(bb => bb.Id);
+            
+            bookmakerBet.Property(bb => bb.BookmakerId).HasColumnName("UserId").HasColumnType("INT").ValueGeneratedOnAdd();
+            bookmakerBet.Property(bb => bb.RaceParticipantBetId).HasColumnName("RaceParticipantBetId").HasColumnType("INT").ValueGeneratedOnAdd();
+
+            bookmakerBet.Property(bb => bb.Coefficient).HasColumnName("Coefficient").HasColumnType("float");
+
+            bookmakerBet.HasMany(bb => bb.UserBets).WithOne(ub => ub.BookmakerBet).HasForeignKey(ub => ub.BookmakerBetId);
         }
 
         private void HorseConfig(EntityTypeBuilder<Horse> horse)
@@ -87,8 +137,7 @@ namespace Web_project_horse_races_db.EntityFramework
             race.Property(r => r.Id).HasColumnName("RaceId").HasColumnType("INT").ValueGeneratedOnAdd();
             race.HasKey(r => r.Id);
             race.Property(r => r.RaceDate).HasColumnName("RaceDate").HasColumnType("DateTime").IsRequired();
-            race.HasMany(r => r.RaceParticipants).WithOne(rp => rp.Race).HasForeignKey(rp => rp.RaceId).OnDelete(DeleteBehavior.NoAction);
-            race.HasMany(r => r.RaceBets).WithOne(rb => rb.Race).HasForeignKey(rb => rb.RaceId).OnDelete(DeleteBehavior.Cascade);
+            race.HasMany(r => r.RaceParticipants).WithOne(rp => rp.Race).HasForeignKey(rp => rp.RaceId).OnDelete(DeleteBehavior.Cascade);
             race.Ignore(r => r.RaceWinner);
         }
         private void RaceParticipantConfig(EntityTypeBuilder<RaceParticipant> raceParticipant)
@@ -99,28 +148,28 @@ namespace Web_project_horse_races_db.EntityFramework
             raceParticipant.HasKey(rp => rp.Id);
             raceParticipant.Property(rp => rp.Number).HasColumnName("RaceParticipantNumber").HasColumnType("TINYINT").IsRequired();
             raceParticipant.Property(rp => rp.Position).HasColumnName("RaceParticipantPosition").HasColumnType("TINYINT");
-            raceParticipant.HasOne(rp => rp.RaceBet).WithOne(rb => rb.RaceParticipant).HasForeignKey<RaceBet>(rb => rb.RaceParicipantId).OnDelete(DeleteBehavior.Cascade);
+            raceParticipant.HasMany(rp => rp.RaceParticipantBets).WithOne(rb => rb.RaceParticipant).HasForeignKey(rb => rb.RaceParticipantId).OnDelete(DeleteBehavior.Cascade);
         }
 
-        private void RaceBetConfig(EntityTypeBuilder<RaceBet> raceBet)
+        private void RaceParticipantBetConfig(EntityTypeBuilder<RaceParticipantBet> raceParticipantBet)
         {
-            raceBet.Property(rb => rb.RaceId).HasColumnName("RaceId").HasColumnType("INT").ValueGeneratedOnAdd();
-            raceBet.Property(rb => rb.RaceParicipantId).HasColumnName("RaceParticipantId").HasColumnType("INT").ValueGeneratedOnAdd();
-            raceBet.HasKey(rb => rb.Id);
-            raceBet.Property(rb => rb.Coefficient).HasColumnName("RaceBetCoefficient").HasColumnType("float");
-            raceBet.Property(rb => rb.TotalSum).HasColumnName("RaceBetTotalSum").HasColumnType("money");
-            raceBet.Property(rb => rb.UserBetCount).HasColumnName("RaceBetUserBetCount").HasColumnType("INT");
-            raceBet.HasMany(rb => rb.UserBets).WithOne(ub => ub.RaceBet).HasForeignKey(ub => ub.RaceBetId).OnDelete(DeleteBehavior.Cascade);
+            raceParticipantBet.ToTable("RaceParticipantsBets");
+            raceParticipantBet.Property(rb => rb.Id).HasColumnName("RaceParticipantBetId").HasColumnType("INT").ValueGeneratedOnAdd();
+            raceParticipantBet.Property(rb => rb.RaceParticipantId).HasColumnName("RaceParticipantId").HasColumnType("INT").ValueGeneratedOnAdd();
+            raceParticipantBet.HasKey(rb => rb.Id);
+            raceParticipantBet.Property(rb => rb.RaceBetTypeId).HasColumnName("RaceBetType").HasColumnType("INT");
+            raceParticipantBet.HasMany(rb => rb.BookmakerBets).WithOne(ub => ub.RaceParticipantBet).HasForeignKey(ub => ub.RaceParticipantBetId).OnDelete(DeleteBehavior.Cascade);
         }
 
-        private void UserBetConfig(EntityTypeBuilder<UserBet> userBet)
+        private void RaceBetTypeConfig(EntityTypeBuilder<RaceBetType> raceBetType)
         {
-            userBet.Property(ub => ub.UserBetProfileId).HasColumnName("UserBetProfileId").HasColumnType("INT").ValueGeneratedOnAdd();
-            userBet.Property(ub => ub.RaceBetId).HasColumnName("UserBetRaceBetId").HasColumnType("INT").ValueGeneratedOnAdd();
-            userBet.HasKey(ub => new { ub.UserBetProfileId, ub.RaceBetId });
-            userBet.Property(ub => ub.BetSum).HasColumnName("UserBetSum").HasColumnType("money");
-            userBet.Property(ub => ub.coefficient).HasColumnName("UserBetCoefficient").HasColumnType("float");
-            userBet.Property(ub => ub.PossibleWinSum).HasColumnName("UserBetPossibleWin").HasColumnType("money");
+            raceBetType.ToTable("RaceBetType");
+            raceBetType.Property(rbt => rbt.RaceBetTypeId).HasColumnName("RaceBetTypeId").HasColumnType("INT").ValueGeneratedOnAdd();
+            raceBetType.Property(rbt => rbt.RaceBetTypeName).HasColumnName("RaceBetTypeName").HasColumnType("varchar(25)");
+            raceBetType.HasAlternateKey(rbt => rbt.RaceBetTypeName);
+            raceBetType.HasMany(rbt => rbt.RaceParticipantBets).WithOne(rpb => rpb.RaceBetType).HasForeignKey(rpb => rpb.RaceBetTypeId);
         }
+
+        
     }
 }

@@ -18,7 +18,7 @@ namespace Web_project_horse_races_db.Model
         public byte Number { set; get; }
         public byte Position { set; get; }
 
-        public RaceBet RaceBet { set; get; }
+        public List<RaceParticipantBet> RaceParticipantBets { set; get; }
 
         public RaceParticipant()
         {
