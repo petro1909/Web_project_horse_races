@@ -6,38 +6,44 @@ using System.Threading.Tasks;
 using Web_project_horse_races_db.EntityFramework;
 using Web_project_horse_races_db.Model;
 using Web_project_horse_races_db.Repository;
+using Web_project_horse_races_db.EntityFramework;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web_project_horse_races_web.Controllers
 {
     public class HorseController : Controller
     {
-        HorseRepository horseRepository;
-        public HorseController()
+        ApplicationContext db;
+        public HorseController(ApplicationContext db)
         {
-            horseRepository = new HorseRepository();
+            this.db = db;
         }
         public IActionResult Index()
         {
-            List<Horse> horses = horseRepository.GetAll();
+            List<Horse> horses = db.Horses.ToList();
             return View(horses);
         }
         [HttpPost]
         public IActionResult Create(Horse horse)
         {
-            horseRepository.Save(horse);
+            db.Horses.Add(horse);
+            db.SaveChanges();
             return LocalRedirect("~/Horse/Index");
         }
 
         [HttpPost]
         public IActionResult Update(Horse horse)
         {
-            horseRepository.Update(horse);
+            db.Horses.Update(horse);
+            db.SaveChanges();
             return RedirectToAction("Index");
         }
+
         [HttpGet]
         public IActionResult Delete(Horse horse)
         {
-            horseRepository.Delete(horse);
+            db.Horses.Remove(horse);
+            db.SaveChanges();
             return LocalRedirect("~/Horse/Index");
         }
     }

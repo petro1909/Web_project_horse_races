@@ -1,49 +1,89 @@
 ﻿@model RacesViewModel
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-@section links { 
-    <link rel="stylesheet" type="text/css" href="~/css/Race/Races.css" />
+@using System.Security.Claims;
+@section links {
+    <link rel="stylesheet" type="text/css" href="~/css/Race/Race.css" />
+
     <link type="text/javascript" href="~/lib/jquery/dist/jquery.js" />
 }
-<section class="wrapper">
-    
-    <section class="race_list">
-        @Html.ActionLink("Add Race", "AddRace")
+@{
+    string type = "";
+    string role = "";
+    if(User.Identity.IsAuthenticated)
+    {
+        type = User.FindFirst(u => u.Type == "type").Value;
+        if(type == "user")
+        {
+            role = User.FindFirst(u => u.Type == System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType).Value;
+        }
+    }
+}
 
+<section class="wrapper">
+
+    <section class="race_list">
+        @if (role == "ADMIN")
+        {
+            <h4 class="add_race"><a asp-controller="Race" asp-action="CreateRace">Add Race</a></h4>
+        }
         @foreach (var raceViewModel in Model.racesViewModel)
         {
-            <div class="race_data" onclick="getRaceDetails(@raceViewModel.race.Id)">
-                <h4>Race №@raceViewModel.race.Id</h4>
-                <h4>Race Date : @raceViewModel.race.RaceDate</h4>
+            <div class="race_data" id="@raceViewModel.race.Id">
+                <div class="race_id" onclick="getRaceDetails(@raceViewModel.race.Id)">
+                    <h4>Race №@raceViewModel.race.Id</h4>
+                    <h4>Race status @raceViewModel.race.RaceStatus</h4>
+                    <h4>Race Date : @raceViewModel.race.RaceDate.ToLongDateString()</h4>
+                    <h4>Race Time : @raceViewModel.race.RaceDate.TimeOfDay</h4>
+                </div>
+                <div class="race_edit">
+
+                    @if (role == "ADMIN")
+                    {
+                        <form asp-controller="Race" asp-action="StartRace" method="post">
+                            <input type="hidden" name="raceId" value="@raceViewModel.race.Id" />
+                            <input type="submit" value="Start" />
+                        </form>
+                        <form asp-controller="Race" asp-action="EndRace" method="post">
+                            <input type="hidden" name="raceId" value="@raceViewModel.race.Id" />
+                            <input type="submit" value="End" />
+                        </form>
+                        <form asp-controller="Race" asp-action="EditRace" method="post">
+                            <input type="hidden" name="raceId" value="@raceViewModel.race.Id" />
+                            <input type="submit" value="Edit" />
+                        </form>
+                        <form asp-controller="Race" asp-action="DeleteRace" method="post">
+                            <input type="hidden" name="raceId" value="@raceViewModel.race.Id" />
+                            <input type="submit" value="Delete" />
+                        </form>
+                    }
+                </div>
             </div>
         }
     </section>
-    <section id="race_details"></section>
+    <section class="race_details" id="race_details"></section>
 
     <section class="user_bet">
-        <form asp-controller="User" asp-action="MakeBet" method="post">
-            <label for="b_sum">Bet sum</label>
-            <input type="number" id="b_sum" name="betSum" />
-
-            <label for="rb_id">Race Bet id</label>
-            <input type="number" id="rb_id" name="bookmakerBetId" />
-
-            @*<div>
-                <p>Possible win</p>
-                <p id="possible_win"></p>
-            </div>*@
-
-            <input type="submit" value="make bet" />
-        </form>
     </section>
+</section>
+@section scripts {
     <script>
-        function getRaceDetails(r_id) {
-            var url = "/Race/ShowRaceDetails/" + r_id;
-            $("#race_details").load(url)
+        function getRaceDetails(raceId) {
+            console.log(raceId)
+            var url = '@Url.Action("ShowRaceDetails", "Race")';
+            // var url = "/Race/ShowRaceDetails/" + r_id;
+            $("#race_details").load(url, { raceId: raceId })
         }
     </script>
-</section>
+    <script>
+        function MakeUserBet(bookmakerBetid) {
+            var url = '@Url.Action("ShowUserBetParialView","Race")';
+            //var url = "/Race/ShowUserBetParialView/" + bookmakerBetid;
+            $(".user_bet").load(url, { id: bookmakerBetid })
+        }
+    </script>
+    <script>
+        function calculate_win(betSum, coefficient) {            
+            $("#possible_win").text(betSum * coefficient);
+        }
+    </script>
+}
 

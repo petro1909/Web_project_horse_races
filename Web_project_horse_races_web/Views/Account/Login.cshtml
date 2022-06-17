@@ -1,46 +1,18 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@{
-    Layout = null;
-}
 @model LoginViewModel
-<!doctype html>
-<html>
-    <head>
-        <title>Login</title>
+@section links 
+{
         <link type="text/css" rel="stylesheet" href="~/css/Account/Login.css" />
-    </head>
-    <body>
-        <section class="login_wrapper">
-            <div class="login_header">
-                <h2>Login</h2>
-            </div>
-            <div class="login_form_wrapper">
-                <form class="login_form" asp-controller="Account" asp-action="Login" method="post">
-                    <div class="login">
-                        <label asp-for="Email">Email adress</label>
-                        <input type="text" asp-for="Email" />
-                        <span asp-validation-for="Email"></span>
-                    </div>
-                    <div class="password">
-                        <label asp-for="Password">Password</label>
-                        <input type="password" asp-for="Password" />
-                        <span asp-validation-for="Password"></span>
-                    </div>
-                    <div class="remember">
-                        <input type="checkbox" id="isRemember" name="isRemember" value="false" />
-                        <label for="isRemember">remember me</label>
-                    </div>
-                    <div class="forget_password">
-                        <a href="">Forget your password?</a>
-                    </div>
-                    <div class="sign_in_button">
-                        <input type="submit" value="Login" />
-                    </div>
-                </form>
-            </div>
-        </section>
-    </body>
-</html>
+}
+<h3>Login</h3>
+<section class="login">
+    <section class="user_login">
+        @await Html.PartialAsync("UserLogin", Model.LoginUserViewModel)
+    </section>
+    <section class="bookmaker_login">
+        @await Html.PartialAsync("BookmakerLogin", Model.LoginBookmakerViewModel)
+    </section>
+</section>
 

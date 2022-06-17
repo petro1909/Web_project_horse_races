@@ -1,12 +1,13 @@
-﻿@model IEnumerable<BaseUser>
+﻿@model IEnumerable<User>
 <!doctype html>
 
 @section links {
     <link rel="stylesheet" href="~/css/user/Users.css" />
 }
-<section class="wrapper">
+<section class="users_wrapper">
     <section class="modelList">
         <h2>User list</h2>
+        <h3>User count : @Model.Count() </h3>
         @foreach (var user in Model)
         {
             <div class="user_item">
@@ -57,34 +58,47 @@
             </div>
         }
     </section>
-    <section class="new_user">
-        <h2>Create User</h2>
-        <form class="register_form" asp-controller="User" asp-action="Create" method="post">
-            <div class="name">
-                <label for="u_name">Name</label>
-                <input type="text" for="u_name" name="name" />
-            </div>
-            <div class="email">
-                <label for="u_email">Email adress</label>
-                <input type="text" id="u_email" name="email" />
-            </div>
-            <div class="password">
-                <label for="u_password">Password</label>
-                <input type="password" id="u_password" name="password" />
-            </div>
-            <div class="user_role">
-                <label for="u_role">Choose Role</label>
-                <select id="u_role" name="roleId">
-                    @foreach (UserRole role in RegisterViewModel.GetUserRoles())
-                    {
-                        <option value=@role.Id>@role.RoleName</option>
-                    }
-                </select>
-            </div>
-            <div class="sign_in_button">
-                <input type="submit" value="Create" />
-            </div>
-        </form>
+    <section class="user_manager">
+        <section class="new_user">
+            <h2>Create User</h2>
+            <form class="register_form" asp-controller="User" asp-action="Create" method="post">
+                <div class="name">
+                    <label for="u_name">Name</label>
+                    <input type="text" for="u_name" name="name" />
+                </div>
+                <div class="email">
+                    <label for="u_email">Email adress</label>
+                    <input type="text" id="u_email" name="email" />
+                </div>
+                <div class="password">
+                    <label for="u_password">Password</label>
+                    <input type="password" id="u_password" name="password" />
+                </div>
+                <div class="user_role">
+                    <label for="u_role">Choose Role</label>
+                    <select id="u_role" asp-items="ViewBag.UserRoles" name="roleId">
+                    </select>
+                </div>
+                <div class="sign_in_button">
+                    <input type="submit" value="Create" />
+                </div>
+            </form>
+        </section>
+        <section class="add_random_user">
+            <h4>Create random users</h4>
+            <form asp-controller="User" asp-action="CreateRandomUsers" method="post">
+                <label for="count">count</label>
+                <input type="number" id="count" name="count" />
+                <label for="startIndex">startIndex</label>
+                <input type="number" id="startIndex" name="startIndex" />
+                <input type="submit" value="create" />
+            </form>
+        </section>
+        <section class="del_all">
+            <form asp-controller="User" asp-action="DeleteAllUsers">
+                <input type="submit" value="delete all users" />
+            </form>
+        </section>
     </section>
 </section>
 @section scripts {

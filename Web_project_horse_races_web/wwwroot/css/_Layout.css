@@ -4,11 +4,15 @@
 }
 
 header {
-    display : flex;
-    flex-direction : row;
-    justify-content : space-between;
-    box-sizing : border-box;
-    padding : 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #000000;
+    color: #FFFFFF;
 }
 
 header section.site_title img {
@@ -18,32 +22,33 @@ header section.site_title img {
 header section.site_title h1 {
     display : inline-block;
     font-size : 30px;
-}
-
-header section.header_menu nav {
-    border: 1px solid black;
-}
-
-header section.header_menu nav ul li a{
-    text-decoration : none;
-    font-size : 20px;
-    font-weight : 700;
-    margin-right : 10px;
 
 }
+
+header section.header_menu nav ul li a {
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 400;
+    margin-right: 10px;
+    color: #FFFFFF;
+}
+
 .header_menu li {
     display: inline;
     list-style: none;
 }
 
-header .user_identity p{
-    margin-right : 10px;
-    display : inline-block;
+header .user_identity p {
+    margin-right: 10px;
+    display: inline-block;
+    color: #FFFFFF;
+    font-size: 17px;
+    font-weight: 400;
 }
 
 header .user_identity p a {
     text-decoration: none;
-    color : darkblue;
-    font-size : 20px;
-    font-weight : 700;
+    font-size: 20px;
+    font-weight: 400;
+    color: #FFFFFF;
 } 

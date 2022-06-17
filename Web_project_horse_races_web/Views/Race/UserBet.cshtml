@@ -1,0 +1,37 @@
+﻿@model BookmakerBet
+@section links {
+    <link rel="stylesheet" type="text/css" href="~/css/Race/userbet.css" />
+}
+<section class="user_bet_wrapper"> 
+    <section class="race_bet_data">
+        @*<div>@Model.RaceParticipantBet.RaceParticipant.Race.RaceDate</div>
+        <div>@Model.RaceParticipantBet.RaceParticipant.Horse.Name</div>
+        <div>@Model.RaceParticipantBet.RaceBetType.RaceBetTypeName</div>
+        <div>@Model.Bookmaker.Name</div>
+        <div>@Model.Coefficient</div>*@
+        <div>Race #1</div>
+        <div>Horse 1</div>
+        <div>WINNER</div>
+        <div>1XBET</div>
+        <div>1.2</div>
+    </section>
+    <section class="user_bet_data">
+        <form asp-controller="Account" asp-action="MakeBet" method="post">
+            <input type="hidden" name="bookmakerBetId" value="@Model.Id" />
+            <div class="bet_amount">
+                <label for="bet_amount">Bet amount</label>
+                <input type="number" id="bet_amount" name="betAmount" onkeyup="calculate_win(this.value, @Model.Coefficient)" />
+                <span>BYN</span>
+            </div>
+            <div>
+                <p>Possible win</p>
+                <p id="possible_win"></p>
+            </div>
+            <input type="submit" value="make bet" />
+        </form>
+    </section>
+</section>
+
+
+
+

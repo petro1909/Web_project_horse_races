@@ -9,29 +9,28 @@
 }
 <section class="wrapper">
 
-    <h3>User №@Model.Id</h3>
-
     <section class="bookmaker_description">
-        @*<section class="user_profile">
-                <form class="user_profile_form">
-                    <div class="user_name">
-                        <label for="u_name">User name</label>
-                        <input type="text" id="u_name" name="name" />
-                    </div>
-                    <div class="user_email">
-                        <label for="u_email">User email</label>
-                        <input type="text" id="u_email" name="email" />
-                    </div>
-                    <div class="user_password">
-                        <label for="u_password">User password</label>
-                        <input type="password" id="u_password" name="passwords" />
-                    </div>
-                    <input type="submit" value="Save changes" />
-                </form>
+        <section class="user_profile">
+            <form class="user_profile_form" asp-controller="Account" asp-action="Update" method="post">
+                @*<input type="hidden" name="id" value="@Model.Id" />
+                <div class="user_name">
+                    <label for="u_name">User name</label>
+                    <input type="text" id="u_name" name="name" value="@Model.Name" />
+                </div>
+                <div class="user_email">
+                    <label for="u_email">User email</label>
+                    <input type="text" id="u_email" name="email" value="@Model.Email" />
+                </div>
+                <div class="user_password">
+                    <label for="u_password">User password</label>
+                    <input type="password" id="u_password" name="password" value="@Model.Password" />
+                </div>
+                <input type="submit" value="Save changes" />*@
+            </form>
 
-                <div>User Ban State : @Model.BanState</div>
-                <button action="~/User/BanUser">Bun user</button>
-            </section>*@
+            @*<div>User Ban State : @Model.BanState</div>*@
+            <button action="~/User/BanUser">Bun user</button>
+        </section>
 
         <section class="user_bet_profile">
             <section class="user_bets">
@@ -47,17 +46,17 @@
                         <th>Position</th>
                         <th>Bet Type</th>
                     </tr>
-                    @foreach (var bookmakerBet in Model.BookmakerBets)
+                    foreach (var bookmakerBet in Model.BookmakerBets)
                     {
                         <tr>
-                            <td>@bookmakerBet.RaceParticipantBet.RaceParticipant.Race.Id</td>
+                            @*<td>@bookmakerBet.RaceParticipantBet.RaceParticipant.Race.Id</td>
                             <td>@bookmakerBet.RaceParticipantBet.RaceParticipant.Race.RaceDate</td>
                             <td>@bookmakerBet.RaceParticipantBet.RaceParticipant.Id</td>
                             <td>@bookmakerBet.RaceParticipantBet.RaceParticipant.Horse.Name</td>
                             <td>@bookmakerBet.RaceParticipantBet.RaceParticipant.Horse.Age</td>
                             <td>@bookmakerBet.RaceParticipantBet.RaceParticipant.Number</td>
                             <td>@bookmakerBet.RaceParticipantBet.RaceParticipant.Position</td>
-                            <td>@bookmakerBet.RaceParticipantBet.RaceBetType.RaceBetTypeName</td>
+                            <td>@bookmakerBet.RaceParticipantBet.RaceBetType.RaceBetTypeName</td>*@
                         </tr>
                         <tr>
                             <table>
@@ -67,13 +66,13 @@
                                     <th>possible win</th>
                                     <th>status</th>
                                 </tr>
-                                @foreach (var userBet in bookmakerBet.UserBets)
+                                foreach (var userBet in bookmakerBet.UserBets)
                                 {
                                     <tr>
-                                        <td>@userBet.BookmakerBet.Coefficient</td>
+                                        @*<td>@userBet.BookmakerBet.Coefficient</td>
                                         <td>@userBet.BetSum</td>
                                         <td>@userBet.PossibleWinSum</td>
-                                        <td>@userBet.BetStatus</td>
+                                        <td>@userBet.BetStatus</td>*@
                                     </tr>
                                 }
                             </table>

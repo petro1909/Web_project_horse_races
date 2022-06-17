@@ -8,17 +8,17 @@ namespace Web_project_horse_races_db.Model
 {
     public class RaceParticipant
     {
-       public int Id { set; get; }
-       public int RaceId { set; get; }
-       public Race Race { set; get; }
+        public int Id { set; get; }
+        public int RaceId { set; get; }
+        public Race Race { set; get; }
 
-       public int HorseId { set; get; }
-       public Horse Horse { set; get; }
+        public int HorseId { set; get; }
+        public Horse Horse { set; get; }
 
         public byte Number { set; get; }
         public byte Position { set; get; }
 
-        public List<RaceParticipantBet> RaceParticipantBets { set; get; }
+        public List<BookmakerBet> BookmakerBets { set; get; }
 
         public RaceParticipant()
         {

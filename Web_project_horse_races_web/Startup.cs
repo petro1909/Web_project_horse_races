@@ -13,7 +13,11 @@ using System.Threading.Tasks;
 using Web_project_horse_races_db.EntityFramework;
 using Web_project_horse_races_db.Repository;
 using Web_project_horse_races_db.Model;
+using Web_project_horse_races_web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using System.Net;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace Web_project_horse_races_web
 {
@@ -26,7 +30,12 @@ namespace Web_project_horse_races_web
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
                 options.LoginPath = new PathString("/Account/Login");
+                options.AccessDeniedPath = new PathString("/Account/Login");
             });
+            services.AddSingleton<ApplicationContext>();
+            //services.AddSingleton<UserService>();
+            //services.AddSingleton<RaceService>();
+            //services.AddSingleton<HorseService>();
             //System.Reflection.Assembly.GetAssembly(typeof(IRepository<>))
             //.GetTypes()
             //.Where(item => item.GetInterfaces()
@@ -45,9 +54,24 @@ namespace Web_project_horse_races_web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            } else
-            {
-                app.UseExceptionHandler("/Home/Error");
+            //} else
+            //{
+                //app.UseExceptionHandler(options =>
+                //{
+                //    options.Run(
+                //        async context =>
+                //        {
+                //            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                //            context.Response.ContentType = "text/html";
+                //            var exceptionObject = context.Features.Get<IExceptionHandlerFeature>();
+                //            if(exceptionObject != null)
+                //            {
+                //                var errorMessage = $"<b>Exception Error: {exceptionObject.Error.Message} <b> {exceptionObject.Error.StackTrace}";
+                //                await context.Response.WriteAsync(errorMessage).ConfigureAwait(false);
+                //            }
+                //        });
+                //});
+                //app.UseExceptionHandler("/Home/Error");
             }
 
             app.UseStaticFiles();

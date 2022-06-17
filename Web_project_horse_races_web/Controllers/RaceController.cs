@@ -5,110 +5,148 @@ using System.Linq;
 using System.Threading.Tasks;
 using Web_project_horse_races_db.Model;
 using Web_project_horse_races_db.Repository;
-using Web_project_horse_races_web.ViewModel;
+using Web_project_horse_races_web.ViewModel.RaceModel;
 using System.Security.Claims;
 using Web_project_horse_races_db.EntityFramework;
+using Web_project_horse_races_web.Services;
+using Microsoft.AspNetCore.Authorization;
+using Web_project_horse_races_web.Util;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web_project_horse_races_web.Controllers
 {
     public class RaceController : Controller
     {
-        RaceRepository raceRepository;
-        HorseRepository horseRepository;
-        RaceParticipantRepository raceParticipantRepository;
-        RaceBetRepository raceBetRepository;
-        UserRepository userRepository;
-        BetTypeRepository betTypeRepository;
-        public RaceController()
+        readonly ApplicationContext db;
+        public RaceController(ApplicationContext db)
         {
-            raceRepository = new RaceRepository();
-            horseRepository = new HorseRepository();
-            raceParticipantRepository = new RaceParticipantRepository();
-            raceBetRepository = new RaceBetRepository();
-            userRepository = new UserRepository();
-            betTypeRepository = new BetTypeRepository();
+            this.db = db;
         }
+
         [HttpGet]
         public IActionResult Index()
         {
-            List<Race> races = raceRepository.GetAll();
+            List<Race> races = db.Races.ToList();
             RacesViewModel racesViewModel = new RacesViewModel(races);
             return View(racesViewModel);
         }
 
-        [Route("/Race/ShowRaceDetails/{id}")]
-        public IActionResult ShowRaceDetails(int id)
+        public IActionResult ShowRaceDetails(int raceId)
         {
-            Race race = raceRepository.GetOneById(id);
-            RaceViewModel raceViewModel = new RaceViewModel(race);
-            return PartialView("RaceDetails", raceViewModel);
-        }
-
-
-        [HttpPost]
-        public IActionResult AddParticipant(byte number, int id, int raceId)
-        {
-            Horse horse = horseRepository.GetOneById(id);
-            RaceParticipant raceParticipant = new RaceParticipant(number) { RaceId = raceId, HorseId = id};
-            raceRepository.AddRaceParticipant(raceParticipant);
-            return LocalRedirect("~/Race/Index");
+            Race race = db.Races.Include(r => r.RaceParticipants).ThenInclude(rp => rp.Horse).
+                Include(r => r.RaceParticipants).ThenInclude(rp => rp.BookmakerBets).ThenInclude(bb => bb.BookmakerRaceBet).FirstOrDefault(r => r.Id == raceId);
+            //RaceViewModel raceViewModel = new RaceViewModel(race);
+            return PartialView("RaceDetails", race);
         }
 
         [HttpGet]
-        public IActionResult DeleteParticipant(RaceParticipant raceParticipant)
+        [Authorize(Roles = "ADMIN")]
+        public IActionResult CreateRace() 
         {
-            raceParticipantRepository.Delete(raceParticipant);
-            return LocalRedirect("~/Race/Index");
-        }
-        [HttpPost]
-        public IActionResult RegisterUserBet(string betSum, int raceBetId)
-        {
-            RaceParticipantBet raceBet = raceBetRepository.GetOneById(raceBetId);
-            int userId = int.Parse(HttpContext.Request.Cookies["Id"]);
-
-            decimal userBetSum = decimal.Parse(betSum);
-
-            return LocalRedirect("~/Race/Index");
-        }
-
-        [HttpGet]
-        public IActionResult AddRace()
-        {
-            List<Horse> horses = horseRepository.GetAll();
-            ViewBag.Horses = horses;
+            List<Horse> horses = db.Horses.ToList();
             return View(horses);
         }
 
         [HttpPost]
-        public IActionResult AddRace(DateTime datetime, List<RaceParticipant> raceParticipants)
+        [Authorize(Roles = "ADMIN")]
+        public IActionResult CreateRace(DateTime datetime, List<RaceParticipant> raceParticipants)
         {
-
             Race race = new Race(datetime, raceParticipants);
-            raceRepository.Save(race);
+            try
+            {
+                db.Races.Add(race);
+                db.SaveChanges();
+            } 
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             return Json(Url.Action("Index"));
         }
 
         [HttpGet]
-        public JsonResult GetBetTypes()
+        [Route("/Race/EditRace/{id}")]
+        [Authorize(Roles = "ADMIN")]
+        public IActionResult EditRace(int id)
         {
-            return Json(betTypeRepository.GetAll());
+            Race race = db.Races.Include(r => r.RaceParticipants).ThenInclude(rp => rp.Horse).FirstOrDefault(r => r.Id == id);
+            List<Horse> horses = db.Horses.ToList();
+            EditRaceViewModel raceModel = new EditRaceViewModel(race);
+            return View(raceModel);
         }
 
-        public IActionResult MakeBookmakerBet(int RaceParticipantBetId,  double betCoefficient)
+
+        [HttpPut]
+        [Authorize(Roles = "ADMIN")]
+        public IActionResult EditRace(EditRaceViewModel raceModel)
         {
-            Claim idClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "id");
-            int userId = int.Parse(idClaim.Value);
-            BookmakerRepository bookmakerRepository = new BookmakerRepository();
-            
-            Bookmaker bookmaker = bookmakerRepository.GetOneById(userId);
+            Race race = raceModel.Race;
+            try
+            {
+                db.Races.Update(race);
+                db.SaveChanges();
+            } 
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
-
-            BookmakerBet bookmakerBet = new BookmakerBet() { BookmakerId = bookmaker.Id, Coefficient = betCoefficient, RaceParticipantBetId = RaceParticipantBetId };
-
-
-            bookmakerRepository.MakeBet(bookmakerBet);
-            return LocalRedirect("~/Race/Index");
+            return LocalRedirect($"EditRace/{race.Id}");
         }
 
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        public IActionResult DeleteRace(int raceId)
+        {
+            try
+            {
+                Race race = db.Races.Find(raceId);
+                db.Races.Remove(race);
+                db.SaveChanges();
+            } 
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            } 
+            return RedirectToAction("Index");
+        }
+
+
+        [HttpPost]
+        public IActionResult StartRace(int raceId)
+        {
+            using (db)
+            {
+                Race race = db.Races.Find(raceId);
+                race.RaceStatus = RaceStatus.RUNNING;
+            }
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult EndRace(int raceId)
+        {
+            using (db)
+            {
+                Race race = db.Races.Find(raceId);
+                race.RaceStatus = RaceStatus.ENDED;
+            }
+            return RedirectToAction("Index");
+        }
+
+
+        //[HttpGet]
+        //public JsonResult GetBetTypes()
+        //{
+        //    return Json(raceService.GetRaceBetTypes());
+        //}
+
+
+        //[Route("/Race/ShowUserBetParialView/{bookmakerBetId}")]
+        //public IActionResult ShowUserBetParialView(int id)
+        //{
+        //    BookmakerBet bet = userService.GetBookmakerBetById(id);
+        //    return PartialView("UserBet", bet);
+        //}
     }
 }

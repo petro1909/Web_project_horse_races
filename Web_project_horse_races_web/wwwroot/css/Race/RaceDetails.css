@@ -1,0 +1,23 @@
+﻿.race_details_wrapper .race_data {
+  background-color: #424242;
+}
+
+.race_details_wrapper .race_data h5 {
+  padding: 5px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #9E9E9E;
+}
+
+.race_details_wrapper .race_participants {
+  width: 100%;
+}
+
+.race_details_wrapper .race_participants .race_participant {
+  display: grid;
+  grid-template-columns: 20% 80%;
+}
+
+.race_details_wrapper .race_participants .race_participant .data div {
+  display: inline;
+}

@@ -6,31 +6,37 @@ using System.Threading.Tasks;
 
 namespace Web_project_horse_races_db.Model
 {
-    public class User : BaseUser
+    public class User
     {
-        public int BetCount { set; get; }
-        public int WinBets { set; get; }
-        public int LooseBets { set; get; }
+        public int Id { get; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public bool BanState { set; get; }
         public List<UserBet> UserBets { set; get; }
         public decimal MoneyBalance { set; get; }
+        public int RoleId { set; get; }
+        public UserRole Role { set; get; }
 
         public User() : base() { }
 
-        public User(string name, string email, string password) : base(name, email, password) {
+        public User(string name, string email, string password) 
+        {
+            Name = name;
+            Email = email;
+            Password = password;
             MoneyBalance = 0;
-            BetCount = 0;
-            WinBets = 0;
-            LooseBets = 0;
             UserBets = new List<UserBet>();
         }
 
         public override string ToString()
         {
-            return base.ToString() + "User Bet Profile [\n" +
-                $"MoneyBalance : {MoneyBalance}\n" +
-                $"Bet Count : {BetCount}\n" +
-                $"Win Bets : {WinBets}\n" +
-                $"Loose Bets : {LooseBets}";
+            return $"User : [\n" +
+                $"\tName : {Name}\n" +
+                $"\tEmail : {Email}\n" +
+                $"\tPassword : {Password}" +
+                $"\tIs Banned : {BanState}" +
+                $"\tMoneyBalance : {MoneyBalance}\n";
         }
     }
 }

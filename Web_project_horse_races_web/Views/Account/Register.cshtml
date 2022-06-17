@@ -4,7 +4,7 @@
 @{
     Layout = null;
 }
-@model RegisterViewModel
+@model RegisterUserViewModel
 <!doctype html>
 <html>
 <head>
@@ -34,15 +34,15 @@
                     <label asp-for="ConfirmPassword">Confirm Password</label>
                     <input type="password" asp-for="ConfirmPassword" />
                 </div>
-                <div class="user_role">
+                <!--<div class="user_role">
                     <label asp-for="RoleId">Choose Role</label>
-                    <select asp-for="RoleId">
-                        @foreach (UserRole role in RegisterViewModel.GetUserRoles())
+                    <select asp-for="RoleId">-->
+                        @*@foreach (UserRole role in RegisterViewModel.GetUserRoles())
                         {
                             <option value=@role.Id>@role.RoleName</option>
-                        }
-                    </select>
-                </div>
+                        }*@
+                    <!--</select>
+                </div>-->
                 <div class="sign_in_button">
                     <input type="submit" value="Login" />
                 </div>

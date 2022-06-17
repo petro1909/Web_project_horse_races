@@ -3,59 +3,95 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Web_project_horse_races_db.Repository;
 using Web_project_horse_races_db.Model;
-using Web_project_horse_races_web.ViewModel.Account;
+using Web_project_horse_races_web.ViewModel.AccountModel;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Web_project_horse_races_web.Services;
+using Microsoft.AspNetCore.Authorization;
+using Web_project_horse_races_web.Infrastructure.Filters;
+using Web_project_horse_races_db.EntityFramework;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web_project_horse_races_web.Controllers
 {
     public class AccountController : Controller
+
     {
-        UserRepository UserRepository;
-        BaseUserRepository baseRepository;
-        public AccountController()
+        readonly ApplicationContext db;
+        public AccountController(ApplicationContext db)
         {
-            UserRepository = new UserRepository();
-            baseRepository = new BaseUserRepository();
+            this.db = db;
         }
 
         [HttpGet]
         public IActionResult Login()
         {
-            return View();
+            return View(new LoginViewModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> UserLogin(LoginUserViewModel model)
         {
             if(!ModelState.IsValid)
             {
-                return View("Login", model);
+                return View("Login", new LoginViewModel() { LoginUserViewModel = model});
             }
 
-            BaseUser user = baseRepository.GetOneByLoginAndPassword(model.Email, model.Password);
+            User user = db.Users.Include(u => u.Role).FirstOrDefault(u => u.Email == model.Email && u.Password == model.Password);
             if (user == null)
             {
                 return View("Login", model);
             }
-            await Authenticate(user);
+            await AuthenticateUser(user);
             return LocalRedirect("~/Home/Index");
         }
 
-        private async Task Authenticate(BaseUser user)
+
+        [HttpPost]
+        public async Task<IActionResult> BookmakerLogin(LoginBookmakerViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Login");
+            }
+
+            Bookmaker bookmaker = db.Bookmakers.FirstOrDefault(b => b.Name == model.Name && b.Password == model.Password);
+            if (bookmaker == null)
+            {
+                return View("Login");
+            }
+            await AuthenticateBookmaker(bookmaker);
+            return LocalRedirect("~/Home/Index");
+        }
+
+
+        private async Task AuthenticateUser(User user)
         {
             var claims = new List<Claim>
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email),
                 new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.RoleName.ToString()),
-                new Claim("id", $"{user.Id}")
+                new Claim("id", $"{user.Id}"),
+                new Claim("banState", $"{user.BanState}"),
+                new Claim("type", "user")
             };
-            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+            ClaimsIdentity id = new(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
         }
+
+        private async Task AuthenticateBookmaker(Bookmaker bookmaker)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, bookmaker.Name),
+                new Claim("type", "bookmaker")
+            };
+            ClaimsIdentity id = new(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Logout()
@@ -71,50 +107,121 @@ namespace Web_project_horse_races_web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel registerModel)
+        public async Task<IActionResult> RegisterUser(RegisterUserViewModel registerModel)
         {
             if (!ModelState.IsValid)
             {
                 return View(registerModel);
             }
-            BaseUser user;
-            UserRole userRole = new UserRolesRepository().GetOneById(registerModel.RoleId);
 
-            if (userRole.RoleName == Role.USER)
+            UserRole role = db.UserRoles.FirstOrDefault(ur => ur.RoleName == Role.USER);
+            User user = new User(registerModel.Name, registerModel.Email, registerModel.Password) { RoleId = role.Id };
+            try
             {
-                UserRepository userRepository = new UserRepository();
-                
-                user = new User(registerModel.Name, registerModel.Email, registerModel.Password);
-                user.RoleId = userRole.Id;
-                userRepository.Save((User)user);
-                user.Role = userRole;
-                await Authenticate(user);
-                return LocalRedirect("~/Home/Index");
-            }
-            if (userRole.RoleName == Role.BOOKMAKER)
+                db.Users.Add(user);
+                db.SaveChanges();
+            } 
+            catch(Exception e)
             {
-                BookmakerRepository bookmakerRepository = new BookmakerRepository();
-                user = new Bookmaker(registerModel.Name, registerModel.Email, registerModel.Password);
-                user.RoleId = userRole.Id;
-                bookmakerRepository.Save((Bookmaker)user);
-                user.Role = userRole;
-                await Authenticate(user);
-                return LocalRedirect("~/Home/Index");
-            }
+                Console.WriteLine(e.Message);
+            } 
+            user.Role = role;
+            await AuthenticateUser(user);
+            
             return View(registerModel);
         }
 
 
-
-        [HttpGet]
-        public IActionResult ShowProfile()
+        [HttpPost]
+        public async Task<IActionResult> RegisterBookmaker(RegisterBookmakerViewModel registerModel)
         {
-            int id = int.Parse(HttpContext.Request.Cookies["id"]);
-            User user = UserRepository.GetOneById(id);
-            return LocalRedirect($"~/SingleUser?id={id}");
+            if (!ModelState.IsValid)
+            {
+                return View(registerModel);
+            }
 
+            Bookmaker bookmaker = new Bookmaker(registerModel.Name, registerModel.Password);
+            try
+            {
+                db.Bookmakers.Add(bookmaker);
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            await AuthenticateBookmaker(bookmaker);
+
+            return View(registerModel);
+        }
+
+        [Authorize]
+        [Route("Account/ShowUserProfile/{id?}")]
+        public IActionResult ShowUserProfile(string strIdentifier)
+        {
+            User user = db.Users.Include(u => u.Role).Include(u => u.UserBets).ThenInclude(ub => ub.UserBetType).
+                Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerRaceBet).ThenInclude(brb => brb.Race).
+                Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerRaceBet).ThenInclude(brb => brb.Bookmaker).
+                Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerBets).ThenInclude(bb => bb.RaceParticipant).ThenInclude(rp => rp.Horse).
+                FirstOrDefault(u => u.Email == strIdentifier);
+            if (user != null)
+            {
+                return View("~/Views/User/SingleUser.cshtml", user);
+            }            
+            return StatusCode(404);
         }
 
 
+
+        [Authorize]
+        [Route("Account/ShowBookmakerProfile/{id?}")]
+        public IActionResult ShowBookmakerProfile(string strIdentifier)
+        {
+            Bookmaker bookmaker = db.Bookmakers.Include(b => b.BookmakerRaceBets).ThenInclude(bb => bb.Race).
+                Include(b => b.BookmakerRaceBets).ThenInclude(brb => brb.UserBets).ThenInclude(ub => ub.BookmakerBets).ThenInclude(bb => bb.RaceParticipant).ThenInclude(rp => rp.Horse).
+                FirstOrDefault(u => u.Name == strIdentifier);
+            if (bookmaker != null)
+            {
+                return View("~/Views/User/SingleUser.cshtml", bookmaker);
+            }
+            return StatusCode(404);
+        }
+
+
+
+        //[Authorize]
+        //[UnbannedUser]
+        //public IActionResult MakeBet(decimal betSum, int RaceBetTypeId, int bookmakerRaceBetId, List<BookmakerBet> bookmakerBets)
+        //{
+        //    Claim idClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "id");
+        //    int userId = int.Parse(idClaim.Value);
+        //    BookmakerBet bet = userService.GetBookmakerBetById(bookmakerBetId);
+
+        //    UserBet userBet = new UserBet() { UserId = userId, /*BookmakerBetId = bookmakerBetId,*/ BetSum = betSum, PossibleWinSum = decimal.Multiply(betSum, (decimal)bet.Coefficient) };
+        //    userService.MakeUserBet(userBet);
+        //    return LocalRedirect("~/Race/Index");
+        //}
+
+        //public string GetUserRole()
+        //{
+        //    return User.FindFirst(u => u.Type == ClaimsIdentity.DefaultRoleClaimType).Value;
+        //}
+
+
+
+        //public IActionResult Update(int id, string name, string email, string password)
+        //{
+        //    User baseUser = userService.GetOneBaseUserById(id);
+        //    baseUser.Name = name;
+        //    baseUser.Email = email;
+        //    baseUser.Password = password;
+        //    userService.UpdateUser(baseUser);
+        //    return LocalRedirect($"~/Account/ShowProfile/{baseUser.Id}");
+        //}
+
+        public IActionResult RenderPartialUserLogin()
+        {
+            return PartialView("UserLogin");
+        }
     }
 }

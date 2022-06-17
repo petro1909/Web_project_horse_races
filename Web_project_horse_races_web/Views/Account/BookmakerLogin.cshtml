@@ -1,0 +1,37 @@
+﻿@model LoginBookmakerViewModel
+@{
+    Layout = null;
+}
+@*@section links
+{*@
+    <link type="text/css" rel="stylesheet" href="~/css/Account/BookmakerLogin.css" />
+@*}*@
+<section class="bookmaker_login_wrapper">
+    <div class="login_header">
+        <h2>Bookmaker</h2>
+    </div>
+    <div class="login_form_wrapper">
+        <form class="login_form" asp-controller="Account" asp-action="BookmakerLogin" method="post">
+            <div class="name">
+                <label asp-for="Name">Name</label>
+                <input type="text" asp-for="Name" />
+                <span asp-validation-for="Name"></span>
+            </div>
+            <div class="password">
+                <label asp-for="Password">Password</label>
+                <input type="password" asp-for="Password" />
+                <span asp-validation-for="Password"></span>
+            </div>
+            <div class="remember">
+                <input type="checkbox" id="isRemember" name="isRemember" value="false" />
+                <label for="isRemember">remember me</label>
+            </div>
+            <div class="forget_password">
+                <a href="">Forget your password?</a>
+            </div>
+            <div class="sign_in_button">
+                <input type="submit" value="Login" />
+            </div>
+        </form>
+    </div>
+</section>

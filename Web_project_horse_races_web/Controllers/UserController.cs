@@ -6,38 +6,46 @@ using System.Threading.Tasks;
 using Web_project_horse_races_db.Model;
 using Web_project_horse_races_db.Repository;
 using System.Security.Claims;
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Web_project_horse_races_web.ViewModel.AccountModel;
+using Web_project_horse_races_web.Infrastructure.Filters;
+using Web_project_horse_races_web.Services;
+using Web_project_horse_races_web.Util;
+using Web_project_horse_races_db.EntityFramework;
+using Microsoft.EntityFrameworkCore;
 namespace Web_project_horse_races_web.Controllers
 {
+    [Authorize(Roles = "ADMIN")]
     public class UserController : Controller
     {
-        public BaseUserRepository baseUserRepository;
-
-        public UserController()
+        readonly ApplicationContext db;
+        public UserController(ApplicationContext db)
         {
-            baseUserRepository = new UserRepository();
+            this.db = db;
         }
 
         [HttpGet("UserList")]
         public IActionResult Index()
         {
-            List<BaseUser> users = baseUserRepository.GetAll();
+            List<User> users = db.Users.Include(u => u.Role).ToList();
+
+            //ViewBag.UserRoles = new SelectList(RegisterViewModel.GetUserRoles(), "Id", "RoleName");
             return View(users);
 
-        } 
-
+        }
+        [HttpGet]
         [Route("SingleUser/{id?}")]
-        public IActionResult Index(int id, Role role)
+        public IActionResult Index(int id)
         {
-            if (role == Role.USER)
+            User user = db.Users.Include(u => u.Role).Include(u => u.UserBets).ThenInclude(ub => ub.UserBetType).
+                Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerRaceBet).ThenInclude(brb => brb.Race).
+                Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerRaceBet).ThenInclude(brb => brb.Bookmaker).
+                Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerBets).ThenInclude(bb => bb.RaceParticipant).ThenInclude(rp => rp.Horse).
+                FirstOrDefault(u => u.Id == id);
+            if (user != null)
             {
-                User user = new UserRepository().GetOneById(id);
                 return View("SingleUser", user);
-            }
-            if (role == Role.BOOKMAKER)
-            {
-                Bookmaker bookmaker = new BookmakerRepository().GetOneById(id);
-                return View("SingleBookmaker", bookmaker);
             }
             return StatusCode(404);
         }
@@ -45,40 +53,46 @@ namespace Web_project_horse_races_web.Controllers
         [HttpPost]
         public IActionResult Create(string name, string email, string password, int roleId)
         {
-            UserRole role = new UserRolesRepository().GetOneById(roleId);
+            //UserRole role = new UserRolesRepository().GetOneById(roleId);
 
-            if (role.RoleName == Role.USER)
-            {
-                UserRepository userRepository = new UserRepository();
-                User user = new User(name, email, password);
-                user.RoleId = role.Id;
-                userRepository.Save(user);
-                user.Role = role;
-            }
-            if (role.RoleName == Role.BOOKMAKER)
-            {
-                BookmakerRepository bookmakerRepository = new BookmakerRepository();
-                Bookmaker bookmaker = new Bookmaker(name, email, password);
-                bookmaker.RoleId = role.Id;
-                bookmakerRepository.Save(bookmaker);
-                bookmaker.Role = role;
+            //if (role.RoleName == Role.USER || role.RoleName == Role.ADMIN)
+            //{
+            //    User user = new User(name, email, password) { RoleId = role.Id};
+            //    userService.CreateUser(user);
+            //}
+            //if (role.RoleName == Role.BOOKMAKER)
+            //{
+            //    Bookmaker bookmaker = new Bookmaker(name, email, password) { RoleId = role.Id};
+            //    userService.CreateBookmaker(bookmaker);
+            //}
+            return LocalRedirect("~/UserList");
+        }
+
+        [HttpGet]
+        public IActionResult BanUser(int id)
+        {
+            using(db) {
+                User user = db.Users.Find(id);
+                user.BanState = !user.BanState;
             }
             return LocalRedirect("~/UserList");
         }
 
-        //[HttpGet]
-        //public IActionResult BanUser(int id)
-        //{   
-        //    userRepository.ChangeUserBanState(id);
-        //    return LocalRedirect("~/UserList");
-        //}
+        [HttpGet]
+        public IActionResult DeleteUser(int id)
+        {
+            User user = db.Users.Find(id);
+            db.Users.Remove(user);
+            db.SaveChanges();
+            return LocalRedirect("~/UserList");
+        }
 
-        //[HttpGet]
-        //public IActionResult DeleteUser(int id)
-        //{
-        //    userRepository.Delete(id);
-        //    return LocalRedirect("~/UserList");
-        //}
+        public IActionResult DeleteAllUsers()
+        {
+            db.Database.ExecuteSqlRaw("DELETE Users");
+            db.SaveChanges();
+            return LocalRedirect("~/UserList");
+        }
 
         //[HttpPost]
         //public IActionResult Update(int id, string name, string email, string password)
@@ -91,21 +105,24 @@ namespace Web_project_horse_races_web.Controllers
         //    return LocalRedirect($"~/SingleUser?id={id}");
         //}
 
-
-        public IActionResult MakeBet(decimal betSum, int bookmakerBetId)
+       
+        public IActionResult CreateRandomUsers(int count, int startIndex)
         {
-            Claim idClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "id");
-            int userId = int.Parse(idClaim.Value);
-            User user = new UserRepository().GetOneById(userId);
-
-            BookmakerBetRepository bookmakerBetRepository = new BookmakerBetRepository();
-            BookmakerBet bet = bookmakerBetRepository.GetOneById(bookmakerBetId);
-            UserBet userBet = new UserBet() { UserId = user.Id, BookmakerBetId = bookmakerBetId, BetSum = betSum, PossibleWinSum = decimal.Multiply(betSum, (decimal)bet.Coefficient) };
-            new UserRepository().AddUserBet(userBet);
-            return LocalRedirect("~/Race/Index");
-
+            DateTime now = DateTime.Now;
+            List<User> users = EntityGenerator.CreateRandomUsers(count, startIndex);
+            try {
+                db.Users.AddRange(users);    
+            } catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            TimeSpan now1 = DateTime.Now - now;
+            ViewBag.Time = now1;
+            
+            
+            Console.WriteLine(now1);
+            Console.WriteLine(now1);
+            return LocalRedirect("~/UserList");
         }
-
-
     }
 }

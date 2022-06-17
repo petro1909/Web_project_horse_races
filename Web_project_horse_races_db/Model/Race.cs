@@ -16,13 +16,14 @@ namespace Web_project_horse_races_db.Model
         public int Id { set; get; }
         public DateTime RaceDate { set; get; }
         public List<RaceParticipant> RaceParticipants { set; get; }
-        public RaceParticipant RaceWinner { set; get; }
+        public List<BookmakerRaceBet> BookmakerRaceBets { set; get; }
         public RaceStatus RaceStatus { set; get; }
         
         public Race() { }
         public Race(DateTime raceDate)
         {
             this.RaceDate = raceDate;
+            BookmakerRaceBets = new List<BookmakerRaceBet>();
             this.RaceParticipants = new List<RaceParticipant>();
         }
 
@@ -30,6 +31,7 @@ namespace Web_project_horse_races_db.Model
         {
             this.RaceDate = raceDate;
             this.RaceParticipants = raceParticipants;
+            BookmakerRaceBets = new List<BookmakerRaceBet>();
         }
 
 

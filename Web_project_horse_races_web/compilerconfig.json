@@ -1,0 +1,26 @@
+﻿[
+  {
+    "outputFile": "wwwroot/css/user/Users.css",
+    "inputFile": "wwwroot/css/user/Users.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/Race/userbet.css",
+    "inputFile": "wwwroot/css/Race/userbet.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/Account/UserLogin.css",
+    "inputFile": "wwwroot/css/Account/UserLogin.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/Account/Login.css",
+    "inputFile": "wwwroot/css/Account/Login.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/Account/BookmakerLogin.css",
+    "inputFile": "wwwroot/css/Account/BookmakerLogin.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/Race/RaceDetails.css",
+    "inputFile": "wwwroot/css/Race/RaceDetails.scss"
+  }
+]
