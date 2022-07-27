@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Web_project_horse_races_db.EntityFramework;
-using Web_project_horse_races_db.Repository;
 using Web_project_horse_races_db.Model;
 using Web_project_horse_races_web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -33,8 +32,9 @@ namespace Web_project_horse_races_web
                 options.AccessDeniedPath = new PathString("/Account/Login");
             });
             services.AddSingleton<ApplicationContext>();
-            //services.AddSingleton<UserService>();
-            //services.AddSingleton<RaceService>();
+            services.AddSingleton<UserService>();
+            services.AddSingleton<RaceService>();
+            services.AddSingleton<BetService>();
             //services.AddSingleton<HorseService>();
             //System.Reflection.Assembly.GetAssembly(typeof(IRepository<>))
             //.GetTypes()

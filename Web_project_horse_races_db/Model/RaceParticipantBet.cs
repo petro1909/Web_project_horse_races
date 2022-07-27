@@ -11,8 +11,8 @@ namespace Web_project_horse_races_db.Model
         public int Id { set; get; }
         public int RaceParticipantId { set; get; }
         public RaceParticipant RaceParticipant { set; get; }
-        public int RaceBetTypeId { set; get; }
-        public RaceBetType RaceBetType { set; get; }
+        public int BetTypeId { set; get; }
+        public BetType BetType { set; get; }
 
 
         public List<BookmakerBet> BookmakerBets { set; get; }

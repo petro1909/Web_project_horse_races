@@ -4,23 +4,19 @@
 }
 <section class="user_bet_wrapper"> 
     <section class="race_bet_data">
-        @*<div>@Model.RaceParticipantBet.RaceParticipant.Race.RaceDate</div>
+        <div>@Model.RaceParticipantBet.RaceParticipant.Race.RaceDate</div>
         <div>@Model.RaceParticipantBet.RaceParticipant.Horse.Name</div>
-        <div>@Model.RaceParticipantBet.RaceBetType.RaceBetTypeName</div>
-        <div>@Model.Bookmaker.Name</div>
-        <div>@Model.Coefficient</div>*@
-        <div>Race #1</div>
-        <div>Horse 1</div>
-        <div>WINNER</div>
-        <div>1XBET</div>
-        <div>1.2</div>
+        <div>@Model.RaceParticipantBet.BetType.Name</div>
+        <div>@Model.BookmakerRaceBet.BookmakerName</div>
+        <div>@Model.Coefficient</div>
+  
     </section>
     <section class="user_bet_data">
-        <form asp-controller="Account" asp-action="MakeBet" method="post">
+        <form asp-controller="User" asp-action="MakeBet" method="post">
             <input type="hidden" name="bookmakerBetId" value="@Model.Id" />
             <div class="bet_amount">
                 <label for="bet_amount">Bet amount</label>
-                <input type="number" id="bet_amount" name="betAmount" onkeyup="calculate_win(this.value, @Model.Coefficient)" />
+                <input type="number" id="bet_amount" name="betAmount" step="0.001" onkeyup="calculate_win(this.value,'@Model.Coefficient')" />
                 <span>BYN</span>
             </div>
             <div>
@@ -31,6 +27,13 @@
         </form>
     </section>
 </section>
+<script>
+    function calculate_win(betSum, coefficient) {
+        console.log(betSum)
+        console.log(coefficient)
+        $("#possible_win").text(parseFloat(betSum) * parseFloat(coefficient.replace(",",".")));
+    }
+</script>
 
 
 

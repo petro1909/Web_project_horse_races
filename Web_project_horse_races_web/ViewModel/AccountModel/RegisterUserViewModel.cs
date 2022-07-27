@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using Web_project_horse_races_db.Model;
-using Web_project_horse_races_db.Repository;
 
 namespace Web_project_horse_races_web.ViewModel.AccountModel
 {

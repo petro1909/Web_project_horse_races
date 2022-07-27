@@ -18,7 +18,8 @@ namespace Web_project_horse_races_db.Model
         public List<RaceParticipant> RaceParticipants { set; get; }
         public List<BookmakerRaceBet> BookmakerRaceBets { set; get; }
         public RaceStatus RaceStatus { set; get; }
-        
+        public int PrizePlaceCount { set; get; }
+
         public Race() { }
         public Race(DateTime raceDate)
         {

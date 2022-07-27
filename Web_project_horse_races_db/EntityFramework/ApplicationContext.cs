@@ -15,19 +15,17 @@ namespace Web_project_horse_races_db.EntityFramework
     public class ApplicationContext : DbContext
     {
         private readonly string connectionString;
-        //public DbSet<BaseUser> BaseUsers => Set<BaseUser>();
         public DbSet<Horse> Horses => Set<Horse>();
         public DbSet<Race> Races => Set<Race>();
         public DbSet<RaceParticipant> RaceParticipants => Set<RaceParticipant>();
         public DbSet<User> Users => Set<User>();
         public DbSet<UserRole> UserRoles => Set<UserRole>();
         public DbSet<UserBet> UserBets => Set<UserBet>();
-        public DbSet<UserBetType> UserBetTypes => Set<UserBetType>();
+        public DbSet<BetType> BetTypes => Set<BetType>();
         public DbSet<Bookmaker> Bookmakers => Set<Bookmaker>();
         public DbSet<BookmakerBet> BookmakerBets => Set<BookmakerBet>();
         public DbSet<BookmakerRaceBet> BookmakerRaceBets => Set<BookmakerRaceBet>();
-
-        // public DbSet<RaceParticipantBet> RaceBets => Set<RaceParticipantBet>();
+        public DbSet<RaceParticipantBet> RaceParticipantBet => Set<RaceParticipantBet>();
 
 
         public ApplicationContext()
@@ -47,15 +45,17 @@ namespace Web_project_horse_races_db.EntityFramework
             modelBuilder.Entity<Horse>(HorseConfig);
             modelBuilder.Entity<Race>(RaceConfig);
             modelBuilder.Entity<RaceParticipant>(RaceParticipantConfig);
-            
-            modelBuilder.Entity<User>(UserConfig);
-            modelBuilder.Entity<UserRole>(UserRoleConfig);
-            modelBuilder.Entity<UserBet>(UserBetConfig);
-            modelBuilder.Entity<UserBetType>(UserBetTypeConfig);
+
+            modelBuilder.Entity<RaceParticipantBet>(RaceParticipantBetTypeConfig);
+            modelBuilder.Entity<BetType>(BetTypeConfig);
 
             modelBuilder.Entity<Bookmaker>(BookmakerConfig);
             modelBuilder.Entity<BookmakerBet>(BookmakerBetConfig);
             modelBuilder.Entity<BookmakerRaceBet>(BookmakerRaceBetConfig);
+            
+            modelBuilder.Entity<User>(UserConfig);
+            modelBuilder.Entity<UserRole>(UserRoleConfig);
+            modelBuilder.Entity<UserBet>(UserBetConfig);
         }
 
         private void UserConfig(EntityTypeBuilder<User> user)
@@ -117,7 +117,7 @@ namespace Web_project_horse_races_db.EntityFramework
             bookmakerBet.Property(bb => bb.Id).HasColumnName("Id").HasColumnType("INT").ValueGeneratedOnAdd();
             bookmakerBet.HasKey(bb => bb.Id);
             
-            bookmakerBet.Property(bb => bb.RaceParticipantId).HasColumnName("RaceParticipantId").HasColumnType("INT").ValueGeneratedOnAdd();
+            bookmakerBet.Property(bb => bb.RaceParticipantBetId).HasColumnName("RaceParticipantBetId").HasColumnType("INT").ValueGeneratedOnAdd();
 
             bookmakerBet.Property(bb => bb.Coefficient).HasColumnName("Coefficient").HasColumnType("float");
         }
@@ -151,26 +151,26 @@ namespace Web_project_horse_races_db.EntityFramework
             raceParticipant.HasKey(rp => rp.Id);
             raceParticipant.Property(rp => rp.Number).HasColumnName("RaceParticipantNumber").HasColumnType("TINYINT").IsRequired();
             raceParticipant.Property(rp => rp.Position).HasColumnName("RaceParticipantPosition").HasColumnType("TINYINT");
-            raceParticipant.HasMany(rp => rp.BookmakerBets).WithOne(rb => rb.RaceParticipant).HasForeignKey(rb => rb.RaceParticipantId).OnDelete(DeleteBehavior.Cascade);
+            raceParticipant.HasMany(rp => rp.BetTypes).WithOne(rb => rb.RaceParticipant).HasForeignKey(rb => rb.RaceParticipantId).OnDelete(DeleteBehavior.Cascade);
         }
 
-        //private void RaceParticipantBetConfig(EntityTypeBuilder<RaceParticipantBet> raceParticipantBet)
-        //{
-        //    raceParticipantBet.ToTable("RaceParticipantsBets");
-        //    raceParticipantBet.Property(rb => rb.Id).HasColumnName("RaceParticipantBetId").HasColumnType("INT").ValueGeneratedOnAdd();
-        //    raceParticipantBet.Property(rb => rb.RaceParticipantId).HasColumnName("RaceParticipantId").HasColumnType("INT").ValueGeneratedOnAdd();
-        //    raceParticipantBet.HasKey(rb => rb.Id);
-        //    raceParticipantBet.Property(rb => rb.RaceBetTypeId).HasColumnName("RaceBetType").HasColumnType("INT");
-        //    raceParticipantBet.HasMany(rb => rb.BookmakerBets).WithOne(ub => ub.RaceParticipantBet).HasForeignKey(ub => ub.RaceParticipantBetId).OnDelete(DeleteBehavior.Cascade);
-        //}
-
-        private void UserBetTypeConfig(EntityTypeBuilder<UserBetType> raceBetType)
+        private void RaceParticipantBetTypeConfig(EntityTypeBuilder<RaceParticipantBet> raceParticipantBet)
         {
-            raceBetType.ToTable("UserBetType");
+            raceParticipantBet.ToTable("RaceParticipantsBets");
+            raceParticipantBet.Property(rb => rb.Id).HasColumnName("RaceParticipantBetId").HasColumnType("INT").ValueGeneratedOnAdd();
+            raceParticipantBet.Property(rb => rb.RaceParticipantId).HasColumnName("RaceParticipantId").HasColumnType("INT").ValueGeneratedOnAdd();
+            raceParticipantBet.HasKey(rb => rb.Id);
+            raceParticipantBet.Property(rb => rb.BetTypeId).HasColumnName("RaceBetType").HasColumnType("INT");
+            raceParticipantBet.HasMany(rb => rb.BookmakerBets).WithOne(ub => ub.RaceParticipantBet).HasForeignKey(ub => ub.RaceParticipantBetId).OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private void BetTypeConfig(EntityTypeBuilder<BetType> raceBetType)
+        {
+            raceBetType.ToTable("BetType");
             raceBetType.Property(rbt => rbt.Id).HasColumnName("Id").HasColumnType("INT").ValueGeneratedOnAdd();
             raceBetType.Property(rbt => rbt.Name).HasColumnName("Name").HasColumnType("varchar(25)");
             raceBetType.HasAlternateKey(rbt => rbt.Name);
-            raceBetType.HasMany(rbt => rbt.UserBets).WithOne(rpb => rpb.UserBetType).HasForeignKey(rpb => rpb.UserBetTypeId);
+            raceBetType.HasMany(rbt => rbt.RaceParticipantsBets).WithOne(rpb => rpb.BetType).HasForeignKey(rpb => rpb.BetTypeId);
         }
 
         private void BookmakerRaceBetConfig(EntityTypeBuilder<BookmakerRaceBet> bookmakerRaceBet)

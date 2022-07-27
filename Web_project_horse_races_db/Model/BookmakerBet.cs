@@ -12,8 +12,8 @@ namespace Web_project_horse_races_db.Model
         public int BookmakerRaceBetId { set; get; }
         public BookmakerRaceBet BookmakerRaceBet { set; get; }
         public List<UserBet> UserBets { set; get; }
-        public int RaceParticipantId { set; get; }
-        public RaceParticipant RaceParticipant { set; get; }
+        public int RaceParticipantBetId { set; get; }
+        public RaceParticipantBet RaceParticipantBet { set; get; }
         public double Coefficient { set; get; }
     }
 }

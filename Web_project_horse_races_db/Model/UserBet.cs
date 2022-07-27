@@ -25,8 +25,6 @@ namespace Web_project_horse_races_db.Model
         public decimal BetSum { set; get; }
         public decimal PossibleWinSum { set; get; }
         public BetStatus BetStatus { set; get; }
-        public int UserBetTypeId { set; get; }
-        public UserBetType UserBetType { set; get; }
 
     }
 }

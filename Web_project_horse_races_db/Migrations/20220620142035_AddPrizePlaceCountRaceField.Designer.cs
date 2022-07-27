@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Web_project_horse_races_db.EntityFramework;
 
 namespace Web_project_horse_races_db.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20220620142035_AddPrizePlaceCountRaceField")]
+    partial class AddPrizePlaceCountRaceField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,26 +34,6 @@ namespace Web_project_horse_races_db.Migrations
                     b.HasIndex("UserBetsId");
 
                     b.ToTable("BookmakerBetUserBet");
-                });
-
-            modelBuilder.Entity("Web_project_horse_races_db.Model.BetType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INT")
-                        .HasColumnName("Id")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("Name");
-
-                    b.HasKey("Id");
-
-                    b.HasAlternateKey("Name");
-
-                    b.ToTable("BetType");
                 });
 
             modelBuilder.Entity("Web_project_horse_races_db.Model.Bookmaker", b =>
@@ -89,16 +71,16 @@ namespace Web_project_horse_races_db.Migrations
                         .HasColumnType("float")
                         .HasColumnName("Coefficient");
 
-                    b.Property<int>("RaceParticipantBetId")
+                    b.Property<int>("RaceParticipantId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INT")
-                        .HasColumnName("RaceParticipantBetId");
+                        .HasColumnName("RaceParticipantId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BookmakerRaceBetId");
 
-                    b.HasIndex("RaceParticipantBetId");
+                    b.HasIndex("RaceParticipantId");
 
                     b.ToTable("BookmakerBets");
                 });
@@ -206,32 +188,6 @@ namespace Web_project_horse_races_db.Migrations
                     b.ToTable("RaceParticipants");
                 });
 
-            modelBuilder.Entity("Web_project_horse_races_db.Model.RaceParticipantBet", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INT")
-                        .HasColumnName("RaceParticipantBetId")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("BetTypeId")
-                        .HasColumnType("INT")
-                        .HasColumnName("RaceBetType");
-
-                    b.Property<int>("RaceParticipantId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INT")
-                        .HasColumnName("RaceParticipantId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BetTypeId");
-
-                    b.HasIndex("RaceParticipantId");
-
-                    b.ToTable("RaceParticipantsBets");
-                });
-
             modelBuilder.Entity("Web_project_horse_races_db.Model.User", b =>
                 {
                     b.Property<int>("Id")
@@ -305,6 +261,9 @@ namespace Web_project_horse_races_db.Migrations
                         .HasColumnType("money")
                         .HasColumnName("PossibleWin");
 
+                    b.Property<int>("UserBetTypeId")
+                        .HasColumnType("INT");
+
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INT")
@@ -314,9 +273,31 @@ namespace Web_project_horse_races_db.Migrations
 
                     b.HasIndex("BookmakerRaceBetId");
 
+                    b.HasIndex("UserBetTypeId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("UserBets");
+                });
+
+            modelBuilder.Entity("Web_project_horse_races_db.Model.UserBetType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INT")
+                        .HasColumnName("Id")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(25)")
+                        .HasColumnName("Name");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("Name");
+
+                    b.ToTable("UserBetType");
                 });
 
             modelBuilder.Entity("Web_project_horse_races_db.Model.UserRole", b =>
@@ -359,15 +340,15 @@ namespace Web_project_horse_races_db.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Web_project_horse_races_db.Model.RaceParticipantBet", "RaceParticipantBet")
+                    b.HasOne("Web_project_horse_races_db.Model.RaceParticipant", "RaceParticipant")
                         .WithMany("BookmakerBets")
-                        .HasForeignKey("RaceParticipantBetId")
+                        .HasForeignKey("RaceParticipantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("BookmakerRaceBet");
 
-                    b.Navigation("RaceParticipantBet");
+                    b.Navigation("RaceParticipant");
                 });
 
             modelBuilder.Entity("Web_project_horse_races_db.Model.BookmakerRaceBet", b =>
@@ -407,25 +388,6 @@ namespace Web_project_horse_races_db.Migrations
                     b.Navigation("Race");
                 });
 
-            modelBuilder.Entity("Web_project_horse_races_db.Model.RaceParticipantBet", b =>
-                {
-                    b.HasOne("Web_project_horse_races_db.Model.BetType", "BetType")
-                        .WithMany("RaceParticipantsBets")
-                        .HasForeignKey("BetTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Web_project_horse_races_db.Model.RaceParticipant", "RaceParticipant")
-                        .WithMany("BetTypes")
-                        .HasForeignKey("RaceParticipantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BetType");
-
-                    b.Navigation("RaceParticipant");
-                });
-
             modelBuilder.Entity("Web_project_horse_races_db.Model.User", b =>
                 {
                     b.HasOne("Web_project_horse_races_db.Model.UserRole", "Role")
@@ -445,6 +407,12 @@ namespace Web_project_horse_races_db.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Web_project_horse_races_db.Model.UserBetType", "UserBetType")
+                        .WithMany("UserBets")
+                        .HasForeignKey("UserBetTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Web_project_horse_races_db.Model.User", "User")
                         .WithMany("UserBets")
                         .HasForeignKey("UserId")
@@ -454,11 +422,8 @@ namespace Web_project_horse_races_db.Migrations
                     b.Navigation("BookmakerRaceBet");
 
                     b.Navigation("User");
-                });
 
-            modelBuilder.Entity("Web_project_horse_races_db.Model.BetType", b =>
-                {
-                    b.Navigation("RaceParticipantsBets");
+                    b.Navigation("UserBetType");
                 });
 
             modelBuilder.Entity("Web_project_horse_races_db.Model.Bookmaker", b =>
@@ -487,15 +452,15 @@ namespace Web_project_horse_races_db.Migrations
 
             modelBuilder.Entity("Web_project_horse_races_db.Model.RaceParticipant", b =>
                 {
-                    b.Navigation("BetTypes");
-                });
-
-            modelBuilder.Entity("Web_project_horse_races_db.Model.RaceParticipantBet", b =>
-                {
                     b.Navigation("BookmakerBets");
                 });
 
             modelBuilder.Entity("Web_project_horse_races_db.Model.User", b =>
+                {
+                    b.Navigation("UserBets");
+                });
+
+            modelBuilder.Entity("Web_project_horse_races_db.Model.UserBetType", b =>
                 {
                     b.Navigation("UserBets");
                 });

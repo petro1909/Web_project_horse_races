@@ -159,15 +159,15 @@ namespace Web_project_horse_races_web.Controllers
         [Route("Account/ShowUserProfile/{id?}")]
         public IActionResult ShowUserProfile(string strIdentifier)
         {
-            User user = db.Users.Include(u => u.Role).Include(u => u.UserBets).ThenInclude(ub => ub.UserBetType).
-                Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerRaceBet).ThenInclude(brb => brb.Race).
-                Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerRaceBet).ThenInclude(brb => brb.Bookmaker).
-                Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerBets).ThenInclude(bb => bb.RaceParticipant).ThenInclude(rp => rp.Horse).
-                FirstOrDefault(u => u.Email == strIdentifier);
-            if (user != null)
-            {
-                return View("~/Views/User/SingleUser.cshtml", user);
-            }            
+            //User user = db.Users.Include(u => u.Role).Include(u => u.UserBets).ThenInclude(ub => ub.UserBetType).
+            //    Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerRaceBet).ThenInclude(brb => brb.Race).
+            //    Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerRaceBet).ThenInclude(brb => brb.Bookmaker).
+            //    Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerBets).ThenInclude(bb => bb.RaceParticipant).ThenInclude(rp => rp.Horse).
+            //    FirstOrDefault(u => u.Email == strIdentifier);
+            //if (user != null)
+            //{
+            //    return View("~/Views/User/SingleUser.cshtml", user);
+            //}            
             return StatusCode(404);
         }
 
@@ -177,36 +177,15 @@ namespace Web_project_horse_races_web.Controllers
         [Route("Account/ShowBookmakerProfile/{id?}")]
         public IActionResult ShowBookmakerProfile(string strIdentifier)
         {
-            Bookmaker bookmaker = db.Bookmakers.Include(b => b.BookmakerRaceBets).ThenInclude(bb => bb.Race).
-                Include(b => b.BookmakerRaceBets).ThenInclude(brb => brb.UserBets).ThenInclude(ub => ub.BookmakerBets).ThenInclude(bb => bb.RaceParticipant).ThenInclude(rp => rp.Horse).
-                FirstOrDefault(u => u.Name == strIdentifier);
-            if (bookmaker != null)
-            {
-                return View("~/Views/User/SingleUser.cshtml", bookmaker);
-            }
+            //Bookmaker bookmaker = db.Bookmakers.Include(b => b.BookmakerRaceBets).ThenInclude(bb => bb.Race).
+            //    Include(b => b.BookmakerRaceBets).ThenInclude(brb => brb.UserBets).ThenInclude(ub => ub.BookmakerBets).ThenInclude(bb => bb.RaceParticipant).ThenInclude(rp => rp.Horse).
+            //    FirstOrDefault(u => u.Name == strIdentifier);
+            //if (bookmaker != null)
+            //{
+            //    return View("~/Views/User/SingleUser.cshtml", bookmaker);
+            //}
             return StatusCode(404);
         }
-
-
-
-        //[Authorize]
-        //[UnbannedUser]
-        //public IActionResult MakeBet(decimal betSum, int RaceBetTypeId, int bookmakerRaceBetId, List<BookmakerBet> bookmakerBets)
-        //{
-        //    Claim idClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "id");
-        //    int userId = int.Parse(idClaim.Value);
-        //    BookmakerBet bet = userService.GetBookmakerBetById(bookmakerBetId);
-
-        //    UserBet userBet = new UserBet() { UserId = userId, /*BookmakerBetId = bookmakerBetId,*/ BetSum = betSum, PossibleWinSum = decimal.Multiply(betSum, (decimal)bet.Coefficient) };
-        //    userService.MakeUserBet(userBet);
-        //    return LocalRedirect("~/Race/Index");
-        //}
-
-        //public string GetUserRole()
-        //{
-        //    return User.FindFirst(u => u.Type == ClaimsIdentity.DefaultRoleClaimType).Value;
-        //}
-
 
 
         //public IActionResult Update(int id, string name, string email, string password)

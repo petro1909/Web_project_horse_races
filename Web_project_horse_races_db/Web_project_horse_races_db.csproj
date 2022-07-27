@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Model\RaceParticipantBet.cs" />
+    <Compile Remove="Model\BaseBet.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Model\RaceParticipantBet.cs" />
+    <None Include="Model\BaseBet.cs" />
   </ItemGroup>
 
   <ItemGroup>

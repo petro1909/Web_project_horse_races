@@ -5,195 +5,46 @@ using System.Threading.Tasks;
 using Web_project_horse_races_db.EntityFramework;
 using Web_project_horse_races_db.Model;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Web_project_horse_races_web.Services
 {
     public class UserService
     {
-        public List<User> GetAllUsers()
+        public void UpdateUserMoneyBalanceByBetResult(UserBet ubet)
         {
-            using (ApplicationContext db = new ApplicationContext())
+            if(ubet.BetStatus == BetStatus.PASSED)
             {
-                return db.Users.Include(u => u.Role).ToList();
+                ubet.User.MoneyBalance += ubet.PossibleWinSum;
             }
         }
 
-        public User GetBaseUserById(int id)
+        public int GetUserBetCount(User user)
         {
-            using (ApplicationContext db = new ApplicationContext())
+            return user.UserBets.Count;
+        }
+
+        public int GetUserSpecifiedBetCount(User user, BetStatus status)
+        {
+            return user.UserBets.Count(ub => ub.BetStatus == status);
+        }
+
+
+        public string GetUserType(ClaimsPrincipal user)
+        {
+            if (user.Claims.Count() == 0)
             {
-                User baseUser = db.Users.Include(u => u.Role).FirstOrDefault(bu => bu.Id == id);
-                return baseUser;
+                return string.Empty;
             }
-        }
 
-
-        public User GetOneByLoginAndPassword(string login, string password)
-        {
-            using (ApplicationContext db = new ApplicationContext()) 
+            string type = user.FindFirst(u => u.Type == "type").Value;
+            if (type == "bookmaker")
             {
-                User user = db.Users.Include(bu => bu.Role).FirstOrDefault(u => u.Email == login && u.Password == password);
-                return user;
+                return "BOOKMAKER";
             }
-        }
-
-
-        public User GetOneBaseUserById(int id)
-        {
-            using (ApplicationContext db = new ApplicationContext())
+            else
             {
-                return db.Users.Find(id);
-            }
-        }
-
-        public User GetOneUserById(int id)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                User user = db.Users.
-                //Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerBet).ThenInclude(bb => bb.Bookmaker).
-                //Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerBet).ThenInclude(bb => bb.RaceParticipantBet).ThenInclude(rpb => rpb.RaceBetType).
-                //Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerBet).ThenInclude(bb => bb.RaceParticipantBet).ThenInclude(rpb => rpb.RaceParticipant).ThenInclude(rp => rp.Horse).
-                //Include(u => u.UserBets).ThenInclude(ub => ub.BookmakerBet).ThenInclude(bb => bb.RaceParticipantBet).ThenInclude(rpb => rpb.RaceParticipant).ThenInclude(rp => rp.Race).
-                FirstOrDefault(u => u.Id == id);
-                return user;
-            }
-        }
-
-        public Bookmaker GetOneBookmakerById(int id)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                Bookmaker user = db.Bookmakers.Find(id);
-                //Include(b => b.BookmakerBets).ThenInclude(bb => bb.UserBets).ThenInclude(ub => ub.User).
-                //Include(b => b.BookmakerBets).ThenInclude(bb => bb.RaceParticipantBet).ThenInclude(rpb => rpb.RaceBetType).
-                //Include(b => b.BookmakerBets).ThenInclude(bb => bb.RaceParticipantBet).ThenInclude(rpb => rpb.RaceParticipant).ThenInclude(rp => rp.Horse).
-                //Include(b => b.BookmakerBets).ThenInclude(bb => bb.RaceParticipantBet).ThenInclude(rpb => rpb.RaceParticipant).ThenInclude(rp => rp.Race).
-                //FirstOrDefault(u => u.Id == id);
-                return user;
-            }
-        }
-
-
-
-        public void CreateUser(User user)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                    db.Users.Add(user);
-                    db.SaveChanges(); 
-            }
-        }
-
-        public void CreateUsers(List<User> users)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                db.Users.AddRange(users);
-                db.SaveChanges();
-            }
-        }
-
-
-        public void CreateBookmaker(Bookmaker bookmaker)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                db.Bookmakers.Add(bookmaker);
-                db.SaveChanges();
-            }
-        }
-
-        public void ChangeUserBanState(int id)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                User user = GetBaseUserById(id);
-                user.BanState = !user.BanState;
-                db.Users.Update(user);
-                db.SaveChanges();
-            }            
-        }
-
-
-
-        public void UpdateUser(User user)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                db.Users.Update(user);
-                db.SaveChanges();
-            }
-        }
-
-
-        public void DeleteSingleUser(int id)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                User user = db.Users.Find(id);
-                db.Users.Remove(user);
-                db.SaveChanges();
-            }
-        }
-
-        public void DeleteAllBaseUsers()
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                db.Database.ExecuteSqlRaw("DELETE Users; DELETE Bookmakers; DELETE BaseUsers");
-            }
-        }
-
-
-
-
-
-
-
-
-        public void MakeUserBet(UserBet bet)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                db.UserBets.Add(bet);
-                db.SaveChanges();
-            }
-        }
-
-        public void UpdateUserBet(UserBet bet)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                db.UserBets.Update(bet);
-                db.SaveChanges();
-            }
-        }
-
-
-        public void MakeBookmakerBet(BookmakerBet bet)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                db.BookmakerBets.Add(bet);
-                db.SaveChanges();
-            }
-        }
-
-        public void UpdateBookmakerBet(BookmakerBet bet)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                db.BookmakerBets.Update(bet);
-                db.SaveChanges();
-            }
-        }
-
-        public BookmakerBet GetBookmakerBetById(int id)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                return db.BookmakerBets.Find(id);
+                return user.FindFirst(u => u.Type == ClaimsIdentity.DefaultRoleClaimType).Value;
             }
         }
     }

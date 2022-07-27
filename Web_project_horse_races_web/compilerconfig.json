@@ -4,10 +4,6 @@
     "inputFile": "wwwroot/css/user/Users.scss"
   },
   {
-    "outputFile": "wwwroot/css/Race/userbet.css",
-    "inputFile": "wwwroot/css/Race/userbet.scss"
-  },
-  {
     "outputFile": "wwwroot/css/Account/UserLogin.css",
     "inputFile": "wwwroot/css/Account/UserLogin.scss"
   },
@@ -22,5 +18,9 @@
   {
     "outputFile": "wwwroot/css/Race/RaceDetails.css",
     "inputFile": "wwwroot/css/Race/RaceDetails.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/User/Userbet.css",
+    "inputFile": "wwwroot/Sass/User/Userbet.scss"
   }
 ]

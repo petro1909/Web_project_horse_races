@@ -1,0 +1,42 @@
+﻿@model IEnumerable<RaceParticipantBet> 
+<table class="race_participants">
+    <tr class="race_participants_header">
+        <th>Horse</th>
+        <th>Data</th>
+        <th>Bookmaker Bets</th>
+    </tr>
+    @foreach (RaceParticipantBet pbet in Model)
+    {
+<tr class="rp">
+    <td class="rp_horse">
+        <p>Name : @pbet.RaceParticipant.Horse.Name</p>
+        <p>Age : @pbet.RaceParticipant.Horse.Age</p>
+    </td>
+    <td>
+        <p>Number : @pbet.RaceParticipant.Number</p>
+    </td>
+    @if (ViewBag.UserType == "BOOKMAKER")
+    {
+        <td class="bookmaker_bet_form">
+            <form asp-controller="Bookmaker" asp-action="MakeBet">
+                <input type="hidden" name="raceParticipantBetId" value="@pbet.Id" />
+                <input type="text" name="coefficient"/>
+                <input type="submit" value="Make bet" />
+            </form>
+        </td>
+    }
+    else
+    {
+        <td class="rp_bookmaker_bets">
+            @foreach (BookmakerBet bb in pbet.BookmakerBets)
+            {
+                <div class="bookmaker_bet" onclick="MakeUserBet(@bb.Id)">
+                    <p>@bb.BookmakerRaceBet.Bookmaker.Name</p>
+                    <p>@bb.Coefficient</p>
+                </div>
+            }
+        </td>
+    }
+</tr>
+    }
+</table>

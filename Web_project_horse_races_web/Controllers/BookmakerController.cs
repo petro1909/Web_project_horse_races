@@ -8,6 +8,7 @@ using Web_project_horse_races_db.Model;
 using Web_project_horse_races_web.Services;
 using Web_project_horse_races_db.EntityFramework;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Web_project_horse_races_web.Controllers
 {
@@ -19,10 +20,28 @@ namespace Web_project_horse_races_web.Controllers
             this.db = db;
         }
 
-        public IActionResult MakeBookmakerBet(int raceParticipantBetId, double betCoefficient)
+        public IActionResult MakeBet(int raceParticipantBetId, string coefficient)
         {
-            Claim idClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "id");
-            int userId = int.Parse(idClaim.Value);
+            Claim nameClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimsIdentity.DefaultNameClaimType);
+            string name = nameClaim.Value;
+
+            RaceParticipantBet rpbet = db.RaceParticipantBet.Find(raceParticipantBetId);
+            int raceId = rpbet.RaceParticipant.RaceId;
+
+            double coeff = double.Parse(coefficient, CultureInfo.InvariantCulture);
+
+            BookmakerRaceBet bookmakerRaceBet = db.BookmakerRaceBets.SingleOrDefault(brb => brb.BookmakerName == name && brb.RaceId == raceId);
+            BookmakerBet bet = null;
+            if (bookmakerRaceBet == null)
+            {
+                bookmakerRaceBet = new BookmakerRaceBet() { BookmakerName = name, RaceId = raceId };
+                bet = new BookmakerBet() { BookmakerRaceBet = bookmakerRaceBet, Coefficient = coeff, RaceParticipantBetId = raceParticipantBetId };
+            } else
+            {
+                bet = new BookmakerBet() { BookmakerRaceBetId = bookmakerRaceBet.Id, Coefficient = coeff, RaceParticipantBetId = raceParticipantBetId };
+            }
+            db.BookmakerBets.Add(bet);
+            db.SaveChanges();
 
 
             //RaceParticipantBet raceParticipantBet = raceService.GetOneRPBById(raceParticipantBetId);
@@ -35,7 +54,7 @@ namespace Web_project_horse_races_web.Controllers
             //        return LocalRedirect("~/Race/Index");
             //    }
             //}
-            //BookmakerBet bookmakerBet = new BookmakerBet() { BookmakerId = userId, Coefficient = betCoefficient, RaceParticipantBetId = raceParticipantBetId };
+            //BookmakerBet bookmakerBet = new BookmakerBet() { BookmakerId = userId, Coefficient = betCoefficient, RaceParticipantId = raceParticipantId };
             //userService.MakeBookmakerBet(bookmakerBet);
             return LocalRedirect("~/Race/Index");
         }

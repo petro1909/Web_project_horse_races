@@ -1,0 +1,33 @@
+﻿@model RaceViewModel
+@*@section links {*@
+<link rel="stylesheet" type="text/css" href="~/css/Race/RaceDetails.css" />
+@*}*@
+<section class="race_details_wrapper">
+    <section class="race_data">
+        <h5>Race №@Model.race.Id</h5>
+        <h5>@Model.race.RaceDate.ToLongDateString()</h5>
+        <h5>@Model.race.RaceDate.TimeOfDay</h5>
+    </section>
+    <section class="race_bets">
+        <ul>
+            @foreach (var betType in Model.BetsWithParticipantsList)
+            {
+            <li class="race_bet">
+                <a href="#" onclick="GetRaceBetParticipants(@Model.race.Id, @betType.BetType.Id)">@betType.BetType.Name</a>
+            </li>
+            }
+        </ul>
+        <section id="race_bet_participants"></section>
+    </section>
+</section>
+    <script>
+        $(document).ready(function () {
+            console.log("sas");
+            $("ul li:first-child").focus();
+        })
+        function GetRaceBetParticipants(raceId, betTypeId)
+        {
+            var url = '@Url.Action("ShowBetRaceParticipants", "Race")';
+            $("#race_bet_participants").load(url, { raceId: raceId, betTypeId: betTypeId })
+        }
+    </script>

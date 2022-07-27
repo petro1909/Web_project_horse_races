@@ -1,0 +1,80 @@
+﻿@model RaceViewModel
+@using System.Security.Claims;
+@*@section links {*@
+    <link rel="stylesheet" type="text/css" href="~/css/Race/RaceDetails.css" />
+@*}*@
+<section class="race_details_wrapper">
+    <section class="race_data">
+        <h5>Race №@Model.race.Id</h5>
+        <h5>@Model.race.RaceDate.ToLongDateString()</h5>
+        <h5>@Model.race.RaceDate.TimeOfDay</h5>
+    </section>
+    <h4>Race participants</h4>
+    <section class="race_participants">
+        <table>
+            <tr>
+                <th>Horse</th>
+                <th>Data</th>
+                <th>Bets</th>
+            </tr>
+            @foreach (RaceParticipant participant in Model.race.RaceParticipants)
+            {
+                <tr class="race_participant">
+                    <td class="horse">
+                        <div>@participant.Horse.Name</div>
+                        <div>@participant.Horse.Age</div>
+                    </td>
+                    <td class="data">
+                        <div>@participant.Number</div>
+                        <div>@participant.Position</div>
+                    </td>
+                    @if (ViewBag.User == "ADMIN")
+                    {
+                        <td class="bookmakers_bets">
+                            @*@foreach (BookmakerBet bbet in participant.BookmakerBets)
+                            {
+                                <div>@bbet.BookmakerRaceBet.Bookmaker.Name</div>
+                                <div>@bbet.Coefficient</div>
+                            }*@
+                        </td>
+                    }
+                        <td class="bookmaker_bet">
+                            <form asp-controller="Bookmaker" asp-action="MakeBookmakerBet" method="post">
+                                <input type="hidden" name="raceParticipantId," value="@participant.Id" />
+                                <label for="b_coeff">Participant coefficient</label>
+                                <input type="number" step="0.001" name="coefficient" id="betCoefficient" />
+                                <input type="submit" />
+                            </form>
+                        </td>
+                </tr>
+            }
+        </table>
+    </section>
+    }
+</section>
+@section scripts {
+    <script>
+        console.log("fefesfsefes");
+        function RenderElementByUserRole(role) {
+            if (role == "USER") {
+                var racesParticipantBet = $(".bets_with_race_participants").children();
+                for (let i = 0; i < racesData.length; i++) {
+                    AddRaceEditElements(racesData[i].getAttribute("id"));
+                }
+            }
+        }
+
+        function GetUserRole() {
+            console.log("daefsefse");
+            $.ajax({
+                type: "GET",
+                url: "/Account/GetUserRole",
+                success: function (role) {
+                    RenderElementByUserRole(role)
+                }
+            })
+        }
+
+        document.addEventListener("DOMContentLoad", GetUserRole)
+    </script>
+}

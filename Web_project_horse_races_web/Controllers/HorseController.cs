@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Web_project_horse_races_db.EntityFramework;
 using Web_project_horse_races_db.Model;
-using Web_project_horse_races_db.Repository;
 using Web_project_horse_races_db.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
