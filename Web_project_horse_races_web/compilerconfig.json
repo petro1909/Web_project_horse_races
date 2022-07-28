@@ -1,24 +1,24 @@
 ﻿[
   {
-    "outputFile": "wwwroot/css/user/Users.css",
-    "inputFile": "wwwroot/css/user/Users.scss"
+    "outputFile": "wwwroot/css/User/Users.css",
+    "inputFile": "wwwroot/Sass/User/Users.scss"
   },
-  {
+{
     "outputFile": "wwwroot/css/Account/UserLogin.css",
-    "inputFile": "wwwroot/css/Account/UserLogin.scss"
-  },
-  {
-    "outputFile": "wwwroot/css/Account/Login.css",
-    "inputFile": "wwwroot/css/Account/Login.scss"
-  },
-  {
-    "outputFile": "wwwroot/css/Account/BookmakerLogin.css",
-    "inputFile": "wwwroot/css/Account/BookmakerLogin.scss"
-  },
-  {
-    "outputFile": "wwwroot/css/Race/RaceDetails.css",
-    "inputFile": "wwwroot/css/Race/RaceDetails.scss"
-  },
+    "inputFile": "wwwroot/Sass/Account/UserLogin.scss"
+},
+    {
+        "outputFile": "wwwroot/css/Account/Login.css",
+        "inputFile": "wwwroot/Sass/Account/Login.scss"
+    },
+    {
+        "outputFile": "wwwroot/css/Account/BookmakerLogin.css",
+        "inputFile": "wwwroot/Sass/Account/BookmakerLogin.scss"
+    },
+    {
+        "outputFile": "wwwroot/css/Race/RaceDetails.css",
+        "inputFile": "wwwroot/Sass/Race/RaceDetails.scss"
+    },
   {
     "outputFile": "wwwroot/css/User/Userbet.css",
     "inputFile": "wwwroot/Sass/User/Userbet.scss"
